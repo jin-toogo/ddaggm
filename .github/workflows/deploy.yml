@@ -10,7 +10,7 @@ env:
   ECS_SERVICE: medihan-service
   ECS_CLUSTER: medihan-cluster
   CONTAINER_NAME: medihan-container
-  NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+  NEXT_PUBLIC_APP_URL: https://medihan.makersfarm.kr
 
 jobs:
   deploy:

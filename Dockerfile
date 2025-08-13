@@ -10,8 +10,9 @@ RUN npm ci
 COPY . .
 ENV NODE_ENV=production
 
-# Build arguments
-ARG NEXT_PUBLIC_APP_URL
+# Environment variables
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 
 # Build the application
@@ -21,11 +22,9 @@ RUN npm run build
 FROM node:18-slim AS runner
 
 WORKDIR /app
-
 # Environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
 # Copy necessary files from builder
 COPY --from=builder /app/.next/standalone ./
