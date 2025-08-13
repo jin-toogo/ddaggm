@@ -106,11 +106,10 @@ export default function Home() {
           <div className="max-w-[1200px] mx-auto px-6">
             <div className="text-center mb-8">
               <h1 className="text-2xl md:text-3xl font-medium text-foreground mb-4">
-                한의원명으로 보험 적용 여부를 확인하세요
+                한방 첩약 보험 적용여부를 검색해보세요
               </h1>
               <p className="text-lg text-muted-foreground">
-                한의원명을 입력하여 한방 첩약 보험 적용 여부를 확인할 수
-                있습니다
+                한의원을 검색하여 한방 첩약 보험 적용 여부를 확인할 수 있습니다
               </p>
             </div>
 

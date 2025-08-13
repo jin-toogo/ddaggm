@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 export function Header() {
@@ -7,28 +8,23 @@ export function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-semibold text-foreground">
-              한의원 보험 적용 확인
+              MediHan&nbsp;메디한
             </h1>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               홈
-            </a>
-            <a
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              도움말
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="https://forms.gle/ynAUn3fswwchot6s6"
+              target="_blank"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               문의
-            </a>
+            </Link>
           </nav>
         </div>
       </div>

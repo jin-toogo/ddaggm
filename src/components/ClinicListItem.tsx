@@ -1,6 +1,7 @@
 import React from "react";
-import { ExternalLink, MapPin, Phone } from "lucide-react";
+import { ExternalLink, MapPin } from "lucide-react";
 import { Clinic } from "@/types/clinics";
+import { Badge } from "@/components/ui/badge";
 
 interface ClinicListItemProps {
   clinic: Clinic;
@@ -37,12 +38,14 @@ export function ClinicListItem({ clinic }: ClinicListItemProps) {
             <span>{clinic.address}</span>
           </div>
 
-          {/* <div className="flex items-center gap-2">
-              <span className="font-medium">지역:</span>
-              <span>
-                {clinic.city} {clinic.district}
-              </span>
-            </div> */}
+          <div className="flex items-center gap-2 mt-2">
+            <Badge
+              variant="outline"
+              className="text-green-800 border-green-50 bg-green-50"
+            >
+              한방 첩약 보험 가능
+            </Badge>
+          </div>
         </div>
 
         <div className="flex flex-col gap-2 flex-shrink-0">

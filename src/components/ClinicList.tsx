@@ -59,8 +59,13 @@ export function ClinicList({
       </div>
 
       {hasMore && (
-        <div className="text-center pt-6">
-          <Button onClick={onLoadMore} variant="outline">
+        <div className="text-center pt-6 ">
+          <Button
+            size="lg"
+            className="text-lg py-6 px-12"
+            onClick={onLoadMore}
+            variant="outline"
+          >
             더 보기
           </Button>
         </div>
