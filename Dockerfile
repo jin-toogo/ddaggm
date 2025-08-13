@@ -12,7 +12,6 @@ ENV NODE_ENV=production
 
 # Environment variables
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
 
 
 # Build the application
@@ -24,7 +23,7 @@ FROM node:18-slim AS runner
 WORKDIR /app
 # Environment variables
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+
 
 # Copy necessary files from builder
 COPY --from=builder /app/.next/standalone ./
