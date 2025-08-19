@@ -10,9 +10,8 @@ RUN npm ci
 COPY . .
 ENV NODE_ENV=production
 
-# Environment variables
-ENV NODE_ENV=production
-
+# Generate Prisma client
+RUN npx prisma generate
 
 # Build the application
 RUN npm run build
