@@ -33,10 +33,6 @@ export async function GET(request: NextRequest) {
       where.district = district;
     }
 
-    if (insurance !== null && insurance !== undefined) {
-      where.insurance = insurance === "true";
-    }
-
     // 병원 목록 조회 (Clinic 인터페이스에 맞게 변환)
     const hospitals = await prisma.hospital.findMany({
       where,
