@@ -16,9 +16,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // 필터 조건 구성
-    const where: any = {
-      insurance: true,
-    };
+    const where: any = {};
 
     if (search) {
       where.OR = [

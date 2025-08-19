@@ -7,11 +7,24 @@ export const searchExamples = [
 ];
 
 // 한의원 데이터를 로드하는 함수
-export async function loadClinics(): Promise<Clinic[]> {
+export async function loadClinics(
+  searchQuery?: string,
+  selectedCity?: string,
+  selectedDistrict?: string,
+  page?: number,
+  limit?: number
+): Promise<Clinic[]> {
   try {
-    // 실제 프로덕션에서는 API 호출을 사용
-    // 여기서는 정적 JSON 파일을 사용
-    const response = await fetch("/api/clinics");
+    const params = new URLSearchParams();
+    
+    if (searchQuery) params.append("search", searchQuery);
+    if (selectedCity && selectedCity !== "all") params.append("province", selectedCity);
+    if (selectedDistrict && selectedDistrict !== "all") params.append("district", selectedDistrict);
+    if (page) params.append("page", page.toString());
+    if (limit) params.append("limit", limit.toString());
+    
+    const url = `/api/clinics${params.toString() ? `?${params.toString()}` : ""}`;
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error("Failed to fetch clinics");
     }

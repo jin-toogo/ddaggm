@@ -64,14 +64,6 @@ export function FilterDropdowns({
           </select>
         </div>
       </div>
-
-      <div className="text-sm text-muted-foreground">
-        총{" "}
-        <span className="font-medium text-foreground">
-          {totalCount.toLocaleString()}
-        </span>
-        개 결과
-      </div>
     </div>
   );
 }

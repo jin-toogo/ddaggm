@@ -1,6 +1,14 @@
 import { notFound } from "next/navigation";
-import { ArrowLeft, Phone, Clock, MapPin, Car, Info } from "lucide-react";
+import {
+  ArrowLeft,
+  Phone,
+  Clock,
+  MapPin,
+  Car,
+  Info,
+} from "lucide-react";
 import Link from "next/link";
+import NonPaymentItems from "@/components/NonPaymentItems";
 
 interface HospitalData {
   id: number;
@@ -49,6 +57,16 @@ interface HospitalData {
     satStart: string | null;
     satEnd: string | null;
   };
+  nonPaymentItems?: NonPaymentItem[];
+}
+
+interface NonPaymentItem {
+  id: number;
+  npayCode: string | null;
+  category: string | null;
+  treatmentName: string | null;
+  amount: number | null;
+  yadmNm: string | null;
 }
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {
@@ -57,11 +75,9 @@ async function getHospitalData(id: string): Promise<HospitalData | null> {
     const baseUrl =
       typeof window === "undefined"
         ? process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-        : "https://medihan.makersfarm.kr";
+        : "https://ddaggm.com";
 
-    const response = await fetch(`${baseUrl}/api/hospitals/${id}`, {
-      cache: "no-store",
-    });
+    const response = await fetch(`${baseUrl}/api/hospitals/${id}`, {});
     if (!response.ok) {
       return null;
     }
@@ -198,6 +214,9 @@ export default async function HospitalDetail({
             )}
           </div>
         </div>
+
+        {/* Non-Payment Items */}
+        <NonPaymentItems items={hospital.nonPaymentItems || []} />
 
         {/* Operating Hours */}
         <div className="bg-white rounded-lg shadow-sm p-6">

@@ -9,40 +9,28 @@ datasource db {
 }
 
 model Hospital {
-  id               Int                        @id @default(autoincrement())
-  encryptedCode    String                     @unique @map("encrypted_code") @db.VarChar(255)
-  name             String                     @map("name") @db.VarChar(255)
-  type             String                     @map("type") @db.VarChar(100)
-  
-  // 위치 정보
-  province         String                     @map("province") @db.VarChar(50)
-  district         String                     @map("district") @db.VarChar(50)
-  dong             String?                    @map("dong") @db.VarChar(50)
-  postalCode       String?                    @map("postal_code") @db.VarChar(10)
-  address          String                     @map("address") @db.Text
-  latitude         Decimal?                   @map("latitude") @db.Decimal(10, 8)
-  longitude        Decimal?                   @map("longitude") @db.Decimal(11, 8)
-  
-  // 연락처 정보
-  phone            String?                    @map("phone") @db.VarChar(20)
-  website          String?                    @map("website") @db.VarChar(255)
-  
-  // 운영 정보
-  establishedDate  String?                    @map("established_date") @db.VarChar(20)
-  totalDoctors     Int?                       @map("total_doctors")
-  
-  // 서비스 가능 여부
-  insurance        Boolean                    @default(false) @map("insurance")
-  
-  // 메타 데이터
-  createdAt        DateTime                   @default(now()) @map("created_at")
-  updatedAt        DateTime                   @updatedAt @map("updated_at")
-  
-  // 관계
-  locationDetails  HospitalLocationDetail?
-  operatingHours   HospitalOperatingHour?
-  nonPaymentItems  HospitalNonPaymentItem[]
-  
+  id              Int                      @id @default(autoincrement())
+  encryptedCode   String                   @unique @map("encrypted_code") @db.VarChar(255)
+  name            String                   @map("name") @db.VarChar(255)
+  type            String                   @map("type") @db.VarChar(100)
+  province        String                   @map("province") @db.VarChar(50)
+  district        String                   @map("district") @db.VarChar(50)
+  dong            String?                  @map("dong") @db.VarChar(50)
+  postalCode      String?                  @map("postal_code") @db.VarChar(10)
+  address         String                   @map("address") @db.Text
+  latitude        Decimal?                 @map("latitude") @db.Decimal(10, 8)
+  longitude       Decimal?                 @map("longitude") @db.Decimal(11, 8)
+  phone           String?                  @map("phone") @db.VarChar(20)
+  website         String?                  @map("website") @db.VarChar(255)
+  establishedDate String?                  @map("established_date") @db.VarChar(20)
+  totalDoctors    Int?                     @map("total_doctors")
+  insurance       Boolean                  @default(false) @map("insurance")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
+  locationDetails HospitalLocationDetail?
+  nonPaymentItems HospitalNonPaymentItem[]
+  operatingHours  HospitalOperatingHour?
+
   @@index([name])
   @@index([province, district])
   @@index([type])
@@ -52,67 +40,49 @@ model Hospital {
 }
 
 model HospitalLocationDetail {
-  id                    Int      @id @default(autoincrement())
-  hospitalId            Int      @unique @map("hospital_id")
-  
-  // 위치 상세
-  landmark              String?  @map("landmark") @db.VarChar(255)
-  direction             String?  @map("direction") @db.Text
-  distance              String?  @map("distance") @db.VarChar(100)
-  
-  // 주차 정보
-  parkingSpaces         Int?     @map("parking_spaces")
-  parkingFeeRequired    String?  @map("parking_fee_required") @db.Char(1)
-  parkingNotes          String?  @map("parking_notes") @db.Text
-  
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @updatedAt @map("updated_at")
-  
-  // 관계
-  hospital              Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
-  
+  id                 Int      @id @default(autoincrement())
+  hospitalId         Int      @unique @map("hospital_id")
+  landmark           String?  @map("landmark") @db.VarChar(255)
+  direction          String?  @map("direction") @db.Text
+  distance           String?  @map("distance") @db.VarChar(100)
+  parkingSpaces      Int?     @map("parking_spaces")
+  parkingFeeRequired String?  @map("parking_fee_required") @db.Char(1)
+  parkingNotes       String?  @map("parking_notes") @db.Text
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  hospital           Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+
   @@index([hospitalId])
   @@map("hospital_location_details")
 }
 
 model HospitalOperatingHour {
-  id                    Int      @id @default(autoincrement())
-  hospitalId            Int      @unique @map("hospital_id")
-  
-  // 휴진 정보
-  sundayInfo            String?  @map("sunday_info") @db.Text
-  holidayInfo           String?  @map("holiday_info") @db.Text
-  
-  // 점심시간
-  lunchWeekday          String?  @map("lunch_weekday") @db.Text
-  lunchSaturday         String?  @map("lunch_saturday") @db.Text
-  
-  // 접수시간
-  receptionWeekday      String?  @map("reception_weekday") @db.Text
-  receptionSaturday     String?  @map("reception_saturday") @db.Text
-  
-  // 요일별 진료시간
-  sunStart              DateTime? @map("sun_start") @db.Time
-  sunEnd                DateTime? @map("sun_end") @db.Time
-  monStart              DateTime? @map("mon_start") @db.Time
-  monEnd                DateTime? @map("mon_end") @db.Time
-  tueStart              DateTime? @map("tue_start") @db.Time
-  tueEnd                DateTime? @map("tue_end") @db.Time
-  wedStart              DateTime? @map("wed_start") @db.Time
-  wedEnd                DateTime? @map("wed_end") @db.Time
-  thuStart              DateTime? @map("thu_start") @db.Time
-  thuEnd                DateTime? @map("thu_end") @db.Time
-  friStart              DateTime? @map("fri_start") @db.Time
-  friEnd                DateTime? @map("fri_end") @db.Time
-  satStart              DateTime? @map("sat_start") @db.Time
-  satEnd                DateTime? @map("sat_end") @db.Time
-  
-  createdAt             DateTime @default(now()) @map("created_at")
-  updatedAt             DateTime @updatedAt @map("updated_at")
-  
-  // 관계
-  hospital              Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
-  
+  id                Int       @id @default(autoincrement())
+  hospitalId        Int       @unique @map("hospital_id")
+  sundayInfo        String?   @map("sunday_info") @db.Text
+  holidayInfo       String?   @map("holiday_info") @db.Text
+  lunchWeekday      String?   @map("lunch_weekday") @db.Text
+  lunchSaturday     String?   @map("lunch_saturday") @db.Text
+  receptionWeekday  String?   @map("reception_weekday") @db.Text
+  receptionSaturday String?   @map("reception_saturday") @db.Text
+  sunStart          DateTime? @map("sun_start") @db.Time(0)
+  sunEnd            DateTime? @map("sun_end") @db.Time(0)
+  monStart          DateTime? @map("mon_start") @db.Time(0)
+  monEnd            DateTime? @map("mon_end") @db.Time(0)
+  tueStart          DateTime? @map("tue_start") @db.Time(0)
+  tueEnd            DateTime? @map("tue_end") @db.Time(0)
+  wedStart          DateTime? @map("wed_start") @db.Time(0)
+  wedEnd            DateTime? @map("wed_end") @db.Time(0)
+  thuStart          DateTime? @map("thu_start") @db.Time(0)
+  thuEnd            DateTime? @map("thu_end") @db.Time(0)
+  friStart          DateTime? @map("fri_start") @db.Time(0)
+  friEnd            DateTime? @map("fri_end") @db.Time(0)
+  satStart          DateTime? @map("sat_start") @db.Time(0)
+  satEnd            DateTime? @map("sat_end") @db.Time(0)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  hospital          Hospital  @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+
   @@index([hospitalId])
   @@map("hospital_operating_hours")
 }
@@ -127,9 +97,8 @@ model HospitalNonPaymentItem {
   yadmNm        String?  @map("yadm_nm") @db.VarChar(255)
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
-  
   hospital      Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
-  
+
   @@unique([hospitalId, npayCode, treatmentName], name: "unique_hospital_item")
   @@index([hospitalId])
   @@index([category])

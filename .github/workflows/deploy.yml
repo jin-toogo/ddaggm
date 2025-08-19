@@ -6,11 +6,11 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: medihan
-  ECS_SERVICE: medihan-service
-  ECS_CLUSTER: medihan-cluster
-  CONTAINER_NAME: medihan-container
-  NEXT_PUBLIC_APP_URL: https://medihan.makersfarm.kr
+  ECR_REPOSITORY: ddaggm
+  ECS_SERVICE: ddaggm-service
+  ECS_CLUSTER: ddaggm-cluster
+  CONTAINER_NAME: ddaggm-container
+  NEXT_PUBLIC_APP_URL: https://ddaggm.com
 
 jobs:
   deploy:

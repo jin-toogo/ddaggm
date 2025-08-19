@@ -9,9 +9,8 @@ import { Footer } from "@/components/Footer";
 import { Clinic } from "@/types/clinics";
 import {
   loadClinics,
-  filterClinics,
-  getCities,
-  getDistricts,
+  cities,
+  districts,
 } from "@/lib/clinics";
 
 const ITEMS_PER_PAGE = 20;
@@ -41,40 +40,54 @@ export default function Home() {
     fetchClinics();
   }, []);
 
-  // 도시와 구/군 목록 계산
-  const cities = useMemo(() => getCities(clinics), [clinics]);
-  const districts = useMemo(
-    () => getDistricts(clinics, selectedCity),
-    [clinics, selectedCity]
-  );
+  // 검색/필터 변경 시 데이터 재로드
+  const fetchFilteredClinics = async () => {
+    try {
+      setIsLoading(true);
+      const data = await loadClinics(searchQuery, selectedCity, selectedDistrict);
+      setClinics(data);
+      setDisplayedCount(ITEMS_PER_PAGE);
+    } catch (error) {
+      console.error("Failed to load filtered clinics:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // 필터링된 한의원 목록
-  const filteredClinics = useMemo(() => {
-    return filterClinics(clinics, searchQuery, selectedCity, selectedDistrict);
-  }, [clinics, searchQuery, selectedCity, selectedDistrict]);
+  // 정적 도시/구군 데이터 사용
+  const availableDistricts = useMemo(() => {
+    if (selectedCity === "all") return [];
+    return districts[selectedCity] || [];
+  }, [selectedCity]);
 
-  const displayedClinics = filteredClinics.slice(0, displayedCount);
-  const hasMore = displayedCount < filteredClinics.length;
+  // 데이터가 서버에서 필터링되므로 clinics 그대로 사용
+  const displayedClinics = clinics.slice(0, displayedCount);
+  const hasMore = displayedCount < clinics.length;
 
   const handleSearch = async (query: string) => {
-    setIsLoading(true);
     setSearchQuery(query);
-    setDisplayedCount(ITEMS_PER_PAGE);
-
-    // 검색 지연 시뮬레이션
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsLoading(false);
+    await fetchFilteredClinics();
   };
 
-  const handleCityChange = (city: string) => {
+  const handleCityChange = async (city: string) => {
     setSelectedCity(city);
     setSelectedDistrict("all");
-    setDisplayedCount(ITEMS_PER_PAGE);
+    // fetchFilteredClinics에서 selectedCity와 selectedDistrict를 참조하므로 
+    // state 업데이트 후에 호출해야 함
+    setTimeout(async () => {
+      const data = await loadClinics(searchQuery, city, "all");
+      setClinics(data);
+      setDisplayedCount(ITEMS_PER_PAGE);
+    }, 0);
   };
 
-  const handleDistrictChange = (district: string) => {
+  const handleDistrictChange = async (district: string) => {
     setSelectedDistrict(district);
-    setDisplayedCount(ITEMS_PER_PAGE);
+    setTimeout(async () => {
+      const data = await loadClinics(searchQuery, selectedCity, district);
+      setClinics(data);
+      setDisplayedCount(ITEMS_PER_PAGE);
+    }, 0);
   };
 
   const handleLoadMore = () => {
@@ -125,9 +138,9 @@ export default function Home() {
               selectedDistrict={selectedDistrict}
               onCityChange={handleCityChange}
               onDistrictChange={handleDistrictChange}
-              totalCount={filteredClinics.length}
+              totalCount={clinics.length}
               cities={cities}
-              districts={districts}
+              districts={availableDistricts}
             />
           </div>
         </section>
