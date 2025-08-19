@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 
     // 쿼리 파라미터
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const limit = parseInt(searchParams.get("limit") || "20");
     const search = searchParams.get("search");
     const province = searchParams.get("province");
     const district = searchParams.get("district");
@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
       where.district = district;
     }
 
+    // 총 개수 조회
+    const totalCount = await prisma.hospital.count({ where });
+    
     // 병원 목록 조회 (Clinic 인터페이스에 맞게 변환)
     const hospitals = await prisma.hospital.findMany({
       where,
@@ -78,7 +81,22 @@ export async function GET(request: NextRequest) {
       })
     );
 
-    return NextResponse.json(clinics);
+    // 페이지네이션 정보 계산
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return NextResponse.json({
+      data: clinics,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        hasNextPage,
+        hasPrevPage,
+        itemsPerPage: limit,
+      },
+    });
   } catch (error) {
     console.error("Error reading clinics data:", error);
     return NextResponse.json(

@@ -7,11 +7,7 @@ import { FilterDropdowns } from "@/components/FilterDropdowns";
 import { ClinicList } from "@/components/ClinicList";
 import { Footer } from "@/components/Footer";
 import { Clinic } from "@/types/clinics";
-import {
-  loadClinics,
-  cities,
-  districts,
-} from "@/lib/clinics";
+import { loadClinics, cities, districts } from "@/lib/clinics";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -21,7 +17,9 @@ export default function Home() {
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedDistrict, setSelectedDistrict] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
-  const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // 초기 데이터 로딩
@@ -29,7 +27,11 @@ export default function Home() {
     const fetchClinics = async () => {
       try {
         const data = await loadClinics();
-        setClinics(data);
+        // 초기 로딩시에는 전체 데이터 반환 (배열)
+
+        setTotalPages(data.pagination.totalPages);
+        setTotalCount(data.pagination.totalCount);
+        setClinics(data.data);
       } catch (error) {
         console.error("Failed to load clinics:", error);
       } finally {
@@ -41,12 +43,35 @@ export default function Home() {
   }, []);
 
   // 검색/필터 변경 시 데이터 재로드
-  const fetchFilteredClinics = async () => {
+  const fetchFilteredClinics = async (page = 1) => {
     try {
       setIsLoading(true);
-      const data = await loadClinics(searchQuery, selectedCity, selectedDistrict);
-      setClinics(data);
-      setDisplayedCount(ITEMS_PER_PAGE);
+      const result = await loadClinics(
+        searchQuery,
+        selectedCity,
+        selectedDistrict,
+        page,
+        ITEMS_PER_PAGE
+      );
+
+      // API 응답이 페이지네이션 정보를 포함하는지 확인
+      if (Array.isArray(result)) {
+        // 이전 버전 호환성 (배열 반환)
+        setClinics(result);
+        setCurrentPage(page);
+        if (result.length < ITEMS_PER_PAGE) {
+          setTotalPages(page);
+        } else {
+          setTotalPages(page + 1);
+        }
+        setTotalCount(result.length + (page - 1) * ITEMS_PER_PAGE);
+      } else {
+        // 새 버전 (페이지네이션 정보 포함)
+        setClinics(result.data);
+        setCurrentPage(result.pagination.currentPage);
+        setTotalPages(result.pagination.totalPages);
+        setTotalCount(result.pagination.totalCount);
+      }
     } catch (error) {
       console.error("Failed to load filtered clinics:", error);
     } finally {
@@ -60,38 +85,34 @@ export default function Home() {
     return districts[selectedCity] || [];
   }, [selectedCity]);
 
-  // 데이터가 서버에서 필터링되므로 clinics 그대로 사용
-  const displayedClinics = clinics.slice(0, displayedCount);
-  const hasMore = displayedCount < clinics.length;
+  // 페이지네이션 관련 계산
+  const hasNextPage = currentPage < totalPages;
+  const hasPrevPage = currentPage > 1;
+
+  // 페이지 변경 핸들러
+  const handlePageChange = async (page: number) => {
+    if (page < 1) return;
+    await fetchFilteredClinics(page);
+  };
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
-    await fetchFilteredClinics();
+    await fetchFilteredClinics(1);
   };
 
   const handleCityChange = async (city: string) => {
     setSelectedCity(city);
     setSelectedDistrict("all");
-    // fetchFilteredClinics에서 selectedCity와 selectedDistrict를 참조하므로 
-    // state 업데이트 후에 호출해야 함
     setTimeout(async () => {
-      const data = await loadClinics(searchQuery, city, "all");
-      setClinics(data);
-      setDisplayedCount(ITEMS_PER_PAGE);
+      await fetchFilteredClinics(1);
     }, 0);
   };
 
   const handleDistrictChange = async (district: string) => {
     setSelectedDistrict(district);
     setTimeout(async () => {
-      const data = await loadClinics(searchQuery, selectedCity, district);
-      setClinics(data);
-      setDisplayedCount(ITEMS_PER_PAGE);
+      await fetchFilteredClinics(1);
     }, 0);
-  };
-
-  const handleLoadMore = () => {
-    setDisplayedCount((prev) => prev + ITEMS_PER_PAGE);
   };
 
   if (isInitialLoading) {
@@ -138,7 +159,7 @@ export default function Home() {
               selectedDistrict={selectedDistrict}
               onCityChange={handleCityChange}
               onDistrictChange={handleDistrictChange}
-              totalCount={clinics.length}
+              totalCount={totalCount}
               cities={cities}
               districts={availableDistricts}
             />
@@ -149,12 +170,65 @@ export default function Home() {
         <section className="py-8">
           <div className="max-w-[1200px] mx-auto px-6">
             <ClinicList
-              clinics={displayedClinics}
+              clinics={clinics}
               isLoading={isLoading}
               searchQuery={searchQuery}
-              hasMore={hasMore}
-              onLoadMore={handleLoadMore}
             />
+
+            {/* 페이지네이션 */}
+            {!isLoading && clinics.length > 0 && (
+              <div className="flex justify-center items-center gap-2 mt-8">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!hasPrevPage}
+                  className="px-4 py-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  이전
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {/* 페이지 번호들 */}
+                  {totalPages > 0 &&
+                    Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const startPage = Math.max(
+                        1,
+                        Math.min(currentPage - 2, totalPages - 4)
+                      );
+                      const pageNum = startPage + i;
+                      if (pageNum > totalPages) return null;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`px-3 py-2 border rounded-md ${
+                            pageNum === currentPage
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "border-gray-300 hover:bg-gray-50"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!hasNextPage}
+                  className="px-4 py-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  다음
+                </button>
+              </div>
+            )}
+
+            {/* 페이지 정보 */}
+            {!isLoading && clinics.length > 0 && (
+              <div className="text-center text-sm text-gray-500 mt-4">
+                페이지 {currentPage} / {totalPages} · 총{" "}
+                {totalCount.toLocaleString()}개
+              </div>
+            )}
           </div>
         </section>
       </main>

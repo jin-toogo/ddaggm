@@ -1,22 +1,17 @@
 import React from "react";
 import { ClinicListItem } from "./ClinicListItem";
-import { Button } from "@/components/ui/button";
 import { Clinic } from "@/types/clinics";
 
 interface ClinicListProps {
   clinics: Clinic[];
   isLoading: boolean;
   searchQuery: string;
-  hasMore: boolean;
-  onLoadMore: () => void;
 }
 
 export function ClinicList({
   clinics,
   isLoading,
   searchQuery,
-  hasMore,
-  onLoadMore,
 }: ClinicListProps) {
   if (isLoading) {
     return (
@@ -58,18 +53,6 @@ export function ClinicList({
         ))}
       </div>
 
-      {hasMore && (
-        <div className="text-center pt-6 ">
-          <Button
-            size="lg"
-            className="text-lg py-6 px-12"
-            onClick={onLoadMore}
-            variant="outline"
-          >
-            더 보기
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

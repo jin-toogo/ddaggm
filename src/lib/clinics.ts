@@ -6,6 +6,19 @@ export const searchExamples = [
   "홍대 한방클리닉",
 ];
 
+// API 응답 타입 정의
+interface ClinicsResponse {
+  data: Clinic[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+    itemsPerPage: number;
+  };
+}
+
 // 한의원 데이터를 로드하는 함수
 export async function loadClinics(
   searchQuery?: string,
@@ -13,25 +26,44 @@ export async function loadClinics(
   selectedDistrict?: string,
   page?: number,
   limit?: number
-): Promise<Clinic[]> {
+): Promise<ClinicsResponse> {
   try {
     const params = new URLSearchParams();
-    
+
     if (searchQuery) params.append("search", searchQuery);
-    if (selectedCity && selectedCity !== "all") params.append("province", selectedCity);
-    if (selectedDistrict && selectedDistrict !== "all") params.append("district", selectedDistrict);
+    if (selectedCity && selectedCity !== "all")
+      params.append("province", selectedCity);
+    if (selectedDistrict && selectedDistrict !== "all")
+      params.append("district", selectedDistrict);
     if (page) params.append("page", page.toString());
     if (limit) params.append("limit", limit.toString());
-    
-    const url = `/api/clinics${params.toString() ? `?${params.toString()}` : ""}`;
+
+    const url = `/api/clinics${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error("Failed to fetch clinics");
     }
-    return await response.json();
+    const result = await response.json();
+    console.log("result :>> ", result);
+
+    // 전체 데이터 로드인 경우 (페이지네이션 없음)
+
+    return result;
   } catch (error) {
     console.error("Error loading clinics:", error);
-    return [];
+    return {
+      data: [],
+      pagination: {
+        currentPage: 0,
+        totalPages: 0,
+        totalCount: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        itemsPerPage: 0,
+      },
+    };
   }
 }
 
