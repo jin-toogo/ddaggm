@@ -44,8 +44,8 @@ export function FilterDropdowns({
           <SelectContent>
             <SelectItem value="all">전체</SelectItem>
             {cities.map((city) => (
-              <SelectItem key={city.value} value={city.value}>
-                {city.label}
+              <SelectItem key={city} value={city}>
+                {city}
               </SelectItem>
             ))}
           </SelectContent>
@@ -62,8 +62,8 @@ export function FilterDropdowns({
           <SelectContent>
             <SelectItem value="all">전체</SelectItem>
             {availableDistricts.map((district) => (
-              <SelectItem key={district.value} value={district.value}>
-                {district.label}
+              <SelectItem key={district} value={district}>
+                {district}
               </SelectItem>
             ))}
           </SelectContent>

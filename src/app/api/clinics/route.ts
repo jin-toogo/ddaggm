@@ -60,18 +60,29 @@ export async function GET(request: NextRequest) {
     });
 
     // Clinic 인터페이스에 맞게 데이터 변환
-    const clinics = hospitals.map((hospital) => ({
-      id: hospital.id.toString(),
-      name: hospital.name,
-      address: hospital.address,
-      city: hospital.province,
-      city_kor: hospital.province,
-      district: hospital.district,
-      district_kor: hospital.district,
-      phone: hospital.phone,
-      insurance: hospital.insurance,
-      status: "active",
-    }));
+    const clinics = hospitals.map(
+      (hospital: {
+        id: number;
+        name: string;
+        address: string;
+        province: string;
+        district: string;
+        phone: string | null;
+        insurance: boolean;
+        type: string;
+      }) => ({
+        id: hospital.id.toString(),
+        name: hospital.name,
+        address: hospital.address,
+        city: hospital.province,
+        city_kor: hospital.province,
+        district: hospital.district,
+        district_kor: hospital.district,
+        phone: hospital.phone,
+        insurance: hospital.insurance,
+        status: "active",
+      })
+    );
 
     return NextResponse.json(clinics);
   } catch (error) {
