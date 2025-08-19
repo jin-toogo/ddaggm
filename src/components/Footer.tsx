@@ -8,7 +8,7 @@ export function Footer() {
         <div className="grid md:grid-cols-3 gap-8">
           <div>
             <h3 className="font-semibold text-foreground mb-4">
-              MediHan&nbsp;메디한
+              DDaGGm&nbsp;따끔
             </h3>
             <p className="text-sm text-muted-foreground">
               한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다.
@@ -27,7 +27,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                {" "}
                 <p>운영시간: 평일 9:00 - 18:00</p>
               </li>
             </ul>
