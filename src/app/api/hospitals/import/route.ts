@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
 
       try {
         // 각 배치를 트랜잭션으로 처리하고 타임아웃을 60초로 설정
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
           for (let i = 0; i < batch.length; i++) {
             const data = batch[i]
             const globalIndex = startIndex + i
