@@ -53,14 +53,15 @@ interface HospitalData {
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {
   try {
-    const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-      }/api/hospitals/${id}`,
-      {
-        cache: "no-store",
-      }
-    );
+    // 서버 사이드에서는 내부 URL 사용, 클라이언트에서는 외부 URL 사용
+    const baseUrl =
+      typeof window === "undefined"
+        ? process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+        : "https://medihan.makersfarm.kr";
+
+    const response = await fetch(`${baseUrl}/api/hospitals/${id}`, {
+      cache: "no-store",
+    });
     if (!response.ok) {
       return null;
     }
