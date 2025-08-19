@@ -26,7 +26,7 @@ export function ClinicList({
     return (
       <div className="text-center py-12">
         <p className="text-lg text-muted-foreground mb-2">
-          &quot{searchQuery}&quot에 대한 검색 결과가 없습니다.
+          &quot;{searchQuery}&quot;에 대한 검색 결과가 없습니다.
         </p>
         <p className="text-sm text-muted-foreground">
           다른 검색어를 시도해보세요.
@@ -52,7 +52,6 @@ export function ClinicList({
           <ClinicListItem key={clinic.id} clinic={clinic} />
         ))}
       </div>
-
     </div>
   );
 }

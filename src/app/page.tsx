@@ -43,13 +43,13 @@ export default function Home() {
   }, []);
 
   // 검색/필터 변경 시 데이터 재로드
-  const fetchFilteredClinics = async (page = 1) => {
+  const fetchFilteredClinics = async (page = 1, customSearchQuery?: string, customCity?: string, customDistrict?: string) => {
     try {
       setIsLoading(true);
       const result = await loadClinics(
-        searchQuery,
-        selectedCity,
-        selectedDistrict,
+        customSearchQuery ?? searchQuery,
+        customCity ?? selectedCity,
+        customDistrict ?? selectedDistrict,
         page,
         ITEMS_PER_PAGE
       );
@@ -97,21 +97,31 @@ export default function Home() {
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
-    await fetchFilteredClinics(1);
+    await fetchFilteredClinics(1, query);
+  };
+
+  const handleClearSearch = async () => {
+    setSearchQuery("");
+    // 검색어를 비운 상태로 초기 데이터 로드
+    const data = await loadClinics();
+    setClinics(data.data);
+    setTotalPages(data.pagination.totalPages);
+    setTotalCount(data.pagination.totalCount);
+    setCurrentPage(1);
   };
 
   const handleCityChange = async (city: string) => {
     setSelectedCity(city);
     setSelectedDistrict("all");
     setTimeout(async () => {
-      await fetchFilteredClinics(1);
+      await fetchFilteredClinics(1, searchQuery, city, "all");
     }, 0);
   };
 
   const handleDistrictChange = async (district: string) => {
     setSelectedDistrict(district);
     setTimeout(async () => {
-      await fetchFilteredClinics(1);
+      await fetchFilteredClinics(1, searchQuery, selectedCity, district);
     }, 0);
   };
 
@@ -147,7 +157,11 @@ export default function Home() {
               </p>
             </div>
 
-            <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+            <SearchBar 
+              onSearch={handleSearch} 
+              isLoading={isLoading} 
+              onClear={handleClearSearch} 
+            />
           </div>
         </section>
 

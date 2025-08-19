@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { searchExamples } from "@/lib/clinics";
@@ -7,15 +7,23 @@ import { searchExamples } from "@/lib/clinics";
 interface SearchBarProps {
   onSearch: (query: string) => void;
   isLoading: boolean;
+  onClear?: () => void;
 }
 
-export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
+export function SearchBar({ onSearch, isLoading, onClear }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       onSearch(searchQuery);
+    }
+  };
+
+  const handleClear = () => {
+    setSearchQuery("");
+    if (onClear) {
+      onClear();
     }
   };
   const handleExampleClick = (example: string) => {
@@ -34,9 +42,19 @@ export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
               placeholder="한의원명을 입력하세요..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-12 text-base"
+              className="pl-10 pr-10 h-12 text-base"
               disabled={isLoading}
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground hover:text-foreground transition-colors"
+                disabled={isLoading}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
           <Button type="submit" className="h-12 px-6" disabled={isLoading}>
             {isLoading ? "검색 중..." : "검색"}
