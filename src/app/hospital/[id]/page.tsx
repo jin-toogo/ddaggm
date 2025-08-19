@@ -1,12 +1,5 @@
 import { notFound } from "next/navigation";
-import {
-  ArrowLeft,
-  Phone,
-  Clock,
-  MapPin,
-  Car,
-  Info,
-} from "lucide-react";
+import { ArrowLeft, Phone, Clock, MapPin, Car, Info } from "lucide-react";
 import Link from "next/link";
 import NonPaymentItems from "@/components/NonPaymentItems";
 
@@ -232,7 +225,7 @@ export default async function HospitalDetail({
                 <span className="text-gray-900">
                   {start && end
                     ? `${formatTime(start)} - ${formatTime(end)}`
-                    : "휴진"}
+                    : "-"}
                 </span>
               </div>
             ))}
