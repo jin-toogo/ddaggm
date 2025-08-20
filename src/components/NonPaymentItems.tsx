@@ -63,11 +63,6 @@ export default function NonPaymentItems({ items }: NonPaymentItemsProps) {
                 <p className="text-sm text-gray-600 line-clamp-2">
                   {item.category || "분류 미상"}
                 </p>
-                {item.npayCode && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    코드: {item.npayCode}
-                  </p>
-                )}
               </div>
               <div className="text-right flex-shrink-0">
                 <span className="text-lg font-semibold text-blue-600">

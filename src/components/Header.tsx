@@ -8,7 +8,7 @@ export function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-semibold text-foreground">
-              DDaGGm&nbsp;따끔
+              DDaggm&nbsp;따끔
             </h1>
           </div>
           <nav className="hidden md:flex items-center space-x-6">

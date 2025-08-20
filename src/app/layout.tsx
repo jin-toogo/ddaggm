@@ -14,6 +14,11 @@ export const metadata: Metadata = {
     "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다. 한방 첩약 보험 적용 정보를 제공합니다.",
   keywords: ["한의원", "보험", "한방", "첩약", "건강보험", "한의원 찾기"],
   authors: [{ name: "한의원 보험 확인 시스템" }],
+  verification: {
+    other: {
+      "naver-site-verification": "5dfcb574f5eb6ef626e6731a9652e955b7db142a",
+    },
+  },
   openGraph: {
     title: "한의원 보험 적용 확인",
     description: "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스",
