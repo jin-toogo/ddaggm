@@ -1,0 +1,54 @@
+# robots.txt for https://ddaggm.com
+
+User-agent: *
+Allow: /
+
+# 차단할 경로들
+Disallow: /private/
+Disallow: /.well-known/
+
+# 크롤링 지연 (선택사항)
+Crawl-delay: 1
+
+# 사이트맵 위치
+Sitemap: https://ddaggm.com/sitemap.xml
+
+# 주요 검색엔진별 설정
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: NaverBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Yeti
+Allow: /
+Crawl-delay: 1
+
+# 악성 봇 차단
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+# 소셜 미디어 크롤러 허용
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
