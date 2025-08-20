@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { FilterDropdowns } from "@/components/FilterDropdowns";
@@ -8,6 +8,10 @@ import { ClinicList } from "@/components/ClinicList";
 import { Footer } from "@/components/Footer";
 import { Clinic } from "@/types/clinics";
 import { loadClinics, cities, districts } from "@/lib/clinics";
+
+// districts 데이터 안전성 검증
+console.log("Imported districts:", districts, "type:", typeof districts);
+const safeDistricts = districts && typeof districts === 'object' ? districts : {};
 
 const ITEMS_PER_PAGE = 20;
 
@@ -140,13 +144,28 @@ export default function Home() {
     }
   };
 
-  // 정적 도시/구군 데이터 사용
-  const availableDistricts = useMemo(() => {
-    if (selectedCity === "all") return [];
-    const result = districts[selectedCity] || [];
-    console.log("availableDistricts for", selectedCity, ":", result);
-    return result;
-  }, [selectedCity]);
+  // 정적 도시/구군 데이터 사용 - useMemo 대신 직접 처리
+  const getAvailableDistricts = () => {
+    console.log("getAvailableDistricts - selectedCity:", selectedCity, "type:", typeof selectedCity);
+    
+    if (selectedCity === "all" || !selectedCity) {
+      console.log("Returning empty array for selectedCity:", selectedCity);
+      return [];
+    }
+    
+    const districtData = safeDistricts[selectedCity];
+    console.log("District data for", selectedCity, ":", districtData, "isArray:", Array.isArray(districtData));
+    
+    if (!districtData || !Array.isArray(districtData)) {
+      console.warn("Invalid district data for", selectedCity, "returning empty array");
+      return [];
+    }
+    
+    console.log("Returning districts:", districtData);
+    return districtData;
+  };
+  
+  const availableDistricts = getAvailableDistricts();
 
   // 페이지네이션 관련 계산
   const hasNextPage = currentPage < totalPages;
