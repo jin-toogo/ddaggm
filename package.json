@@ -10,6 +10,7 @@
     "update-hospital-codes": "node src/scripts/update_hospital_codes.js",
     "crawl-nonpayment": "node scripts/crawl-nonpayment.js",
     "sitemap:generate": "node scripts/generate-sitemap.js",
+    "robots:generate": "node scripts/generate-robots.js",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",

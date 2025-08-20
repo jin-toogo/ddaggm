@@ -13,6 +13,17 @@ const ITEMS_PER_PAGE = 20;
 
 export default function Home() {
   const [clinics, setClinics] = useState<Clinic[]>([]);
+  
+  // 안전한 setClinics 함수 - 항상 배열만 허용
+  const safeSetClinics = (data: any) => {
+    console.log("safeSetClinics called with:", data, "type:", typeof data, "isArray:", Array.isArray(data));
+    if (Array.isArray(data)) {
+      setClinics(data);
+    } else {
+      console.warn("Non-array data passed to setClinics, setting empty array");
+      setClinics([]);
+    }
+  };
 
   // 안전장치: clinics가 항상 배열인지 확인
   const safeClinics = Array.isArray(clinics) ? clinics : [];
@@ -50,12 +61,12 @@ export default function Home() {
         if (Array.isArray(data)) {
           // 이전 버전 호환성 (배열 반환)
           console.log("Setting clinics as array:", data);
-          setClinics(data);
+          safeSetClinics(data);
           setTotalCount(data.length);
         } else {
           // 새 버전 (페이지네이션 정보 포함)
           console.log("Setting clinics from data.data:", data.data);
-          setClinics(data.data || []);
+          safeSetClinics(data.data || []);
           setCurrentPage(data.pagination?.currentPage || 1);
           setTotalPages(data.pagination?.totalPages || 0);
           setTotalCount(data.pagination?.totalCount || 0);
@@ -103,7 +114,7 @@ export default function Home() {
           "Setting clinics as array from fetchFilteredClinics:",
           result
         );
-        setClinics(result);
+        safeSetClinics(result);
         setCurrentPage(page);
         if (result.length < ITEMS_PER_PAGE) {
           setTotalPages(page);
@@ -117,7 +128,7 @@ export default function Home() {
           "Setting clinics from result.data in fetchFilteredClinics:",
           result.data
         );
-        setClinics(result.data || []);
+        safeSetClinics(result.data || []);
         setCurrentPage(result.pagination?.currentPage || page);
         setTotalPages(result.pagination?.totalPages || 0);
         setTotalCount(result.pagination?.totalCount || 0);
@@ -162,7 +173,7 @@ export default function Home() {
       1,
       ITEMS_PER_PAGE
     );
-    setClinics(data.data);
+    safeSetClinics(data.data);
     setTotalPages(data.pagination.totalPages);
     setTotalCount(data.pagination.totalCount);
     setCurrentPage(1);
@@ -171,16 +182,12 @@ export default function Home() {
   const handleCityChange = async (city: string) => {
     setSelectedCity(city);
     setSelectedDistrict("all");
-    setTimeout(async () => {
-      await fetchFilteredClinics(1, searchQuery, city, "all");
-    }, 0);
+    await fetchFilteredClinics(1, searchQuery, city, "all");
   };
 
   const handleDistrictChange = async (district: string) => {
     setSelectedDistrict(district);
-    setTimeout(async () => {
-      await fetchFilteredClinics(1, searchQuery, selectedCity, district);
-    }, 0);
+    await fetchFilteredClinics(1, searchQuery, selectedCity, district);
   };
 
   if (isInitialLoading) {
