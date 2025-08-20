@@ -26,12 +26,12 @@ export default function Home() {
   useEffect(() => {
     const fetchClinics = async () => {
       try {
-        const data = await loadClinics();
-        // 초기 로딩시에는 전체 데이터 반환 (배열)
-
+        const data = await loadClinics(undefined, undefined, undefined, 1, ITEMS_PER_PAGE);
+        
         setTotalPages(data.pagination.totalPages);
         setTotalCount(data.pagination.totalCount);
         setClinics(data.data);
+        setCurrentPage(data.pagination.currentPage);
       } catch (error) {
         console.error("Failed to load clinics:", error);
       } finally {
@@ -103,7 +103,7 @@ export default function Home() {
   const handleClearSearch = async () => {
     setSearchQuery("");
     // 검색어를 비운 상태로 초기 데이터 로드
-    const data = await loadClinics();
+    const data = await loadClinics(undefined, undefined, undefined, 1, ITEMS_PER_PAGE);
     setClinics(data.data);
     setTotalPages(data.pagination.totalPages);
     setTotalCount(data.pagination.totalCount);
