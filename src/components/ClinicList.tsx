@@ -13,6 +13,10 @@ export function ClinicList({
   isLoading,
   searchQuery,
 }: ClinicListProps) {
+  console.log("ClinicList received clinics:", clinics, "type:", typeof clinics, "isArray:", Array.isArray(clinics));
+  
+  // 안전장치: clinics가 배열이 아닌 경우 빈 배열로 처리
+  const safeClinic = Array.isArray(clinics) ? clinics : [];
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -22,7 +26,7 @@ export function ClinicList({
     );
   }
 
-  if (searchQuery && clinics.length === 0) {
+  if (searchQuery && safeClinic.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-lg text-muted-foreground mb-2">
@@ -35,7 +39,7 @@ export function ClinicList({
     );
   }
 
-  if (clinics.length === 0) {
+  if (safeClinic.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-lg text-muted-foreground">
@@ -48,7 +52,7 @@ export function ClinicList({
   return (
     <div className="space-y-4">
       <div className="grid gap-4">
-        {clinics.map((clinic) => (
+        {safeClinic.map((clinic) => (
           <ClinicListItem key={clinic.id} clinic={clinic} />
         ))}
       </div>

@@ -26,12 +26,30 @@ export default function Home() {
   useEffect(() => {
     const fetchClinics = async () => {
       try {
-        const data = await loadClinics(undefined, undefined, undefined, 1, ITEMS_PER_PAGE);
+        const data = await loadClinics(
+          undefined,
+          undefined,
+          undefined,
+          1,
+          ITEMS_PER_PAGE
+        );
+
+        console.log("Initial fetch data:", data, "type:", typeof data, "isArray:", Array.isArray(data));
         
-        setTotalPages(data.pagination.totalPages);
-        setTotalCount(data.pagination.totalCount);
-        setClinics(data.data);
-        setCurrentPage(data.pagination.currentPage);
+        // API 응답이 페이지네이션 정보를 포함하는지 확인
+        if (Array.isArray(data)) {
+          // 이전 버전 호환성 (배열 반환)
+          console.log("Setting clinics as array:", data);
+          setClinics(data);
+          setTotalCount(data.length);
+        } else {
+          // 새 버전 (페이지네이션 정보 포함)
+          console.log("Setting clinics from data.data:", data.data);
+          setClinics(data.data || []);
+          setCurrentPage(data.pagination?.currentPage || 1);
+          setTotalPages(data.pagination?.totalPages || 0);
+          setTotalCount(data.pagination?.totalCount || 0);
+        }
       } catch (error) {
         console.error("Failed to load clinics:", error);
       } finally {
@@ -43,7 +61,12 @@ export default function Home() {
   }, []);
 
   // 검색/필터 변경 시 데이터 재로드
-  const fetchFilteredClinics = async (page = 1, customSearchQuery?: string, customCity?: string, customDistrict?: string) => {
+  const fetchFilteredClinics = async (
+    page = 1,
+    customSearchQuery?: string,
+    customCity?: string,
+    customDistrict?: string
+  ) => {
     try {
       setIsLoading(true);
       const result = await loadClinics(
@@ -103,7 +126,13 @@ export default function Home() {
   const handleClearSearch = async () => {
     setSearchQuery("");
     // 검색어를 비운 상태로 초기 데이터 로드
-    const data = await loadClinics(undefined, undefined, undefined, 1, ITEMS_PER_PAGE);
+    const data = await loadClinics(
+      undefined,
+      undefined,
+      undefined,
+      1,
+      ITEMS_PER_PAGE
+    );
     setClinics(data.data);
     setTotalPages(data.pagination.totalPages);
     setTotalCount(data.pagination.totalCount);
@@ -157,10 +186,10 @@ export default function Home() {
               </p>
             </div>
 
-            <SearchBar 
-              onSearch={handleSearch} 
-              isLoading={isLoading} 
-              onClear={handleClearSearch} 
+            <SearchBar
+              onSearch={handleSearch}
+              isLoading={isLoading}
+              onClear={handleClearSearch}
             />
           </div>
         </section>
