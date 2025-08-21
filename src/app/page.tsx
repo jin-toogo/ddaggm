@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { FilterDropdowns } from "@/components/FilterDropdowns";
@@ -9,28 +10,11 @@ import { Footer } from "@/components/Footer";
 import { Clinic } from "@/types/clinics";
 import { loadClinics, cities, districts } from "@/lib/clinics";
 
-// districts 데이터 안전성 검증
-console.log("Imported districts:", districts, "type:", typeof districts);
-const safeDistricts = districts && typeof districts === 'object' ? districts : {};
-
 const ITEMS_PER_PAGE = 20;
 
 export default function Home() {
   const [clinics, setClinics] = useState<Clinic[]>([]);
-  
-  // 안전한 setClinics 함수 - 항상 배열만 허용
-  const safeSetClinics = (data: any) => {
-    console.log("safeSetClinics called with:", data, "type:", typeof data, "isArray:", Array.isArray(data));
-    if (Array.isArray(data)) {
-      setClinics(data);
-    } else {
-      console.warn("Non-array data passed to setClinics, setting empty array");
-      setClinics([]);
-    }
-  };
 
-  // 안전장치: clinics가 항상 배열인지 확인
-  const safeClinics = Array.isArray(clinics) ? clinics : [];
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
   const [selectedDistrict, setSelectedDistrict] = useState("all");
@@ -52,25 +36,14 @@ export default function Home() {
           ITEMS_PER_PAGE
         );
 
-        console.log(
-          "Initial fetch data:",
-          data,
-          "type:",
-          typeof data,
-          "isArray:",
-          Array.isArray(data)
-        );
-
         // API 응답이 페이지네이션 정보를 포함하는지 확인
         if (Array.isArray(data)) {
           // 이전 버전 호환성 (배열 반환)
-          console.log("Setting clinics as array:", data);
-          safeSetClinics(data);
+          setClinics(data);
           setTotalCount(data.length);
         } else {
           // 새 버전 (페이지네이션 정보 포함)
-          console.log("Setting clinics from data.data:", data.data);
-          safeSetClinics(data.data || []);
+          setClinics(data.data || []);
           setCurrentPage(data.pagination?.currentPage || 1);
           setTotalPages(data.pagination?.totalPages || 0);
           setTotalCount(data.pagination?.totalCount || 0);
@@ -118,7 +91,7 @@ export default function Home() {
           "Setting clinics as array from fetchFilteredClinics:",
           result
         );
-        safeSetClinics(result);
+        setClinics(result);
         setCurrentPage(page);
         if (result.length < ITEMS_PER_PAGE) {
           setTotalPages(page);
@@ -132,7 +105,7 @@ export default function Home() {
           "Setting clinics from result.data in fetchFilteredClinics:",
           result.data
         );
-        safeSetClinics(result.data || []);
+        setClinics(result.data || []);
         setCurrentPage(result.pagination?.currentPage || page);
         setTotalPages(result.pagination?.totalPages || 0);
         setTotalCount(result.pagination?.totalCount || 0);
@@ -146,25 +119,20 @@ export default function Home() {
 
   // 정적 도시/구군 데이터 사용 - useMemo 대신 직접 처리
   const getAvailableDistricts = () => {
-    console.log("getAvailableDistricts - selectedCity:", selectedCity, "type:", typeof selectedCity);
-    
-    if (selectedCity === "all" || !selectedCity) {
-      console.log("Returning empty array for selectedCity:", selectedCity);
-      return [];
-    }
-    
-    const districtData = safeDistricts[selectedCity];
-    console.log("District data for", selectedCity, ":", districtData, "isArray:", Array.isArray(districtData));
-    
+    const districtData = districts[selectedCity];
+
     if (!districtData || !Array.isArray(districtData)) {
-      console.warn("Invalid district data for", selectedCity, "returning empty array");
+      console.warn(
+        "Invalid district data for",
+        selectedCity,
+        "returning empty array"
+      );
       return [];
     }
-    
-    console.log("Returning districts:", districtData);
+
     return districtData;
   };
-  
+
   const availableDistricts = getAvailableDistricts();
 
   // 페이지네이션 관련 계산
@@ -192,7 +160,7 @@ export default function Home() {
       1,
       ITEMS_PER_PAGE
     );
-    safeSetClinics(data.data);
+    setClinics(data.data);
     setTotalPages(data.pagination.totalPages);
     setTotalCount(data.pagination.totalCount);
     setCurrentPage(1);
@@ -268,13 +236,13 @@ export default function Home() {
         <section className="py-8">
           <div className="max-w-[1200px] mx-auto px-6">
             <ClinicList
-              clinics={safeClinics}
+              clinics={clinics}
               isLoading={isLoading}
               searchQuery={searchQuery}
             />
 
             {/* 페이지네이션 */}
-            {!isLoading && safeClinics.length > 0 && (
+            {!isLoading && clinics.length > 0 && (
               <div className="flex justify-center items-center gap-2 mt-8">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
@@ -321,7 +289,7 @@ export default function Home() {
             )}
 
             {/* 페이지 정보 */}
-            {!isLoading && safeClinics.length > 0 && (
+            {!isLoading && clinics.length > 0 && (
               <div className="text-center text-sm text-gray-500 mt-4">
                 페이지 {currentPage} / {totalPages} · 총{" "}
                 {totalCount.toLocaleString()}개

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const limit = parseInt(searchParams.get("limit") || "500");
 
     // 모든 카테고리 데이터 가져오기
     const allCategories = await prisma.hospitalNonPaymentItem.findMany({
@@ -26,12 +26,12 @@ export async function GET(request: NextRequest) {
       if (item.category) {
         // '/' 기준으로 분해
         const splitCategories = item.category
-          .split('/')
-          .map(cat => cat.trim()) // 앞뒤 공백 제거
-          .filter(cat => cat.length > 0); // 빈 문자열 제거
+          .split("/")
+          .map((cat) => cat.trim()) // 앞뒤 공백 제거
+          .filter((cat) => cat.length > 0); // 빈 문자열 제거
 
         // 각 분해된 카테고리별로 카운트 증가
-        splitCategories.forEach(splitCat => {
+        splitCategories.forEach((splitCat) => {
           const currentCount = categoryBreakdown.get(splitCat) || 0;
           categoryBreakdown.set(splitCat, currentCount + 1);
         });
@@ -55,15 +55,15 @@ export async function GET(request: NextRequest) {
 
     // 원본 카테고리 예시들도 함께 제공
     const categoryExamples = new Map<string, Set<string>>();
-    
+
     allCategories.forEach((item) => {
       if (item.category) {
         const splitCategories = item.category
-          .split('/')
-          .map(cat => cat.trim())
-          .filter(cat => cat.length > 0);
+          .split("/")
+          .map((cat) => cat.trim())
+          .filter((cat) => cat.length > 0);
 
-        splitCategories.forEach(splitCat => {
+        splitCategories.forEach((splitCat) => {
           if (!categoryExamples.has(splitCat)) {
             categoryExamples.set(splitCat, new Set());
           }
@@ -75,9 +75,12 @@ export async function GET(request: NextRequest) {
     });
 
     // 예시를 포함한 최종 결과
-    const finalResults = sortedBreakdown.map(item => ({
+    const finalResults = sortedBreakdown.map((item) => ({
       ...item,
-      examples: Array.from(categoryExamples.get(item.category) || []).slice(0, 3), // 상위 3개 예시만
+      examples: Array.from(categoryExamples.get(item.category) || []).slice(
+        0,
+        10
+      ), // 상위 3개 예시만
     }));
 
     return NextResponse.json({

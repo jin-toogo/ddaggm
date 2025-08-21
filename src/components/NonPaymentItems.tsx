@@ -84,7 +84,7 @@ export default function NonPaymentItems({ items }: NonPaymentItemsProps) {
               <button
                 onClick={handleToggle}
                 disabled={isLoading}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -98,8 +98,7 @@ export default function NonPaymentItems({ items }: NonPaymentItemsProps) {
                   </>
                 ) : (
                   <>
-                    <ChevronDown className="w-4 h-4" />더 보기 (
-                    {items.length - 10}개 더)
+                    <ChevronDown className="w-4 h-4" />더 보기
                   </>
                 )}
               </button>

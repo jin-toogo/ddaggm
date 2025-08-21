@@ -8,9 +8,10 @@ interface SearchBarProps {
   onSearch: (query: string) => void;
   isLoading: boolean;
   onClear?: () => void;
+  placeholder?: string;
 }
 
-export function SearchBar({ onSearch, isLoading, onClear }: SearchBarProps) {
+export function SearchBar({ onSearch, isLoading, onClear, placeholder = "한의원명을 입력하세요..." }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -39,7 +40,7 @@ export function SearchBar({ onSearch, isLoading, onClear }: SearchBarProps) {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="한의원명을 입력하세요..."
+              placeholder={placeholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-10 h-12 text-base"

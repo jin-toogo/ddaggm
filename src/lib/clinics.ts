@@ -46,7 +46,14 @@ export async function loadClinics(
       throw new Error("Failed to fetch clinics");
     }
     const result = await response.json();
-    console.log("loadClinics API result:", result, "type:", typeof result, "isArray:", Array.isArray(result));
+    console.log(
+      "loadClinics API result:",
+      result,
+      "type:",
+      typeof result,
+      "isArray:",
+      Array.isArray(result)
+    );
 
     // 전체 데이터 로드인 경우 (페이지네이션 없음)
 
@@ -120,6 +127,112 @@ export function getDistricts(
   );
   return Array.from(districts).sort();
 }
+
+// 7가지 주요 치료법 카테고리 (기획서 기반)
+export const treatmentCategories = [
+  {
+    id: "chuna",
+    name: "추나요법",
+    searchKeyword: "추나",
+    description: "척추/관절 교정 치료",
+    dataCount: 500,
+    percentage: 3.3,
+    keywords: [
+      "추나",
+      "척추교정",
+      "관절교정",
+      "자세교정",
+      "단순추나",
+      "복잡추나",
+      "특수추나",
+    ],
+  },
+  {
+    id: "herbal-injection",
+    name: "약침술",
+    searchKeyword: "약침",
+    description: "경혈 약침 치료",
+    dataCount: 3046,
+    percentage: 20.08,
+    keywords: ["약침", "봉침"],
+  },
+  {
+    id: "manual-therapy",
+    name: "도수치료",
+    searchKeyword: "도수",
+    description: "근골격계 재활 치료",
+
+    dataCount: 1409,
+    percentage: 9.29,
+    keywords: [
+      "도수",
+      "물리치료",
+      "재활치료",
+      "근육치료",
+      "일반 도수치료",
+      "전문 도수치료",
+    ],
+  },
+  {
+    id: "shockwave",
+    name: "체외충격파치료",
+    description: "충격파를 이용한 치료",
+    searchKeyword: "충격파",
+    dataCount: 819,
+    percentage: 5.4,
+    keywords: ["충격파", "체외충격파", "족저근막염치료", "체외충격파치료"],
+  },
+  {
+    id: "ultrasound",
+    name: "초음파검사",
+    description: "근골격 초음파 진단",
+    searchKeyword: "초음파",
+    dataCount: 443,
+    percentage: 2.92,
+    keywords: [
+      "관절초음파",
+      "근골격초음파",
+      "무릎초음파",
+      "어깨초음파",
+      "근골격 관절 초음파",
+      "근골격 연부조직 초음파",
+    ],
+  },
+  {
+    id: "mri",
+    name: "MRI검사",
+    description: "자기공명영상 정밀진단",
+    searchKeyword: "MRI",
+    dataCount: 405,
+    percentage: 2.67,
+    keywords: ["MRI"],
+  },
+  {
+    id: "vaccination",
+    name: "예방접종",
+    description: "각종 백신 접종",
+    searchKeyword: "예방접종",
+    dataCount: 787,
+    percentage: 5.19,
+    keywords: [
+      "독감예방접종",
+      "대상포진백신",
+      "폐렴구균백신",
+      "A형간염 예방접종",
+      "예방접종",
+    ],
+  },
+];
+
+export const nonCoveredServices = [
+  "추나요법",
+  "약침술",
+  "도수치료",
+  "체외충격파치료",
+  "초음파검사",
+  "MRI검사",
+  "예방접종",
+];
 
 export const cities = [
   "서울특별시",

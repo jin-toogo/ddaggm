@@ -4,11 +4,11 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const limit = parseInt(searchParams.get("limit") || "140");
 
     // category별로 그룹화해서 개수 및 통계 계산
     const popularCategories = await prisma.hospitalNonPaymentItem.groupBy({
-      by: ['category'],
+      by: ["category"],
       _count: {
         id: true,
       },
@@ -31,10 +31,10 @@ export async function GET(request: NextRequest) {
       },
       orderBy: {
         _count: {
-          id: 'desc',
+          id: "desc",
         },
       },
-      take: limit,
+      // take: limit,
     });
 
     // 각 카테고리별 고유 treatmentName 개수도 조회
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       popularCategories.map(async (category) => {
         const uniqueTreatments = await prisma.hospitalNonPaymentItem.findMany({
           select: { treatmentName: true },
-          distinct: ['treatmentName'],
+          distinct: ["treatmentName"],
           where: {
             category: category.category,
             treatmentName: { not: null },

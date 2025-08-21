@@ -19,6 +19,12 @@ export function Header() {
               홈
             </Link>
             <Link
+              href="/non-covered"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              비급여
+            </Link>
+            <Link
               href="https://forms.gle/ynAUn3fswwchot6s6"
               target="_blank"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
