@@ -108,7 +108,6 @@ export function NonCoveredList({
             </span>
           )}
         </div>
-        <div className="text-sm text-gray-500">{items.length}개 항목</div>
       </div>
 
       {/* 비급여 항목 리스트 */}

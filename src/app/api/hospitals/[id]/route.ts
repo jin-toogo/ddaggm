@@ -26,10 +26,9 @@ export async function GET(
         operatingHours: true,
         nonPaymentItems: {
           orderBy: {
-            amount: 'desc'
+            amount: "asc",
           },
-          take: 20
-        }
+        },
       },
     });
 
