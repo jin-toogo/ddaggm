@@ -38,7 +38,7 @@ export default function NonCoveredPage() {
   useEffect(() => {
     const fetchNonCoveredItems = async () => {
       try {
-        const url = `/api/nonpayment/items?page=1&limit=${ITEMS_PER_PAGE}`;
+        const url = `/api/nonpayment/items?category=chuna&page=1&limit=${ITEMS_PER_PAGE}`;
         console.log("Initial fetch URL:", url);
 
         const response = await fetch(url);
