@@ -69,9 +69,9 @@ export default function NonCoveredPage() {
   const fetchFilteredItems = async (
     page = 1,
     customSearchQuery?: string,
-    customTreatment?: string,
-    customCity?: string,
-    customOrder?: string
+    customTreatment?: string
+    // customCity?: string,
+    // customOrder?: string // 추후 개발
   ) => {
     try {
       setIsLoading(true);
@@ -101,13 +101,14 @@ export default function NonCoveredPage() {
         params.append("search", query.trim());
       }
 
-      const city = customCity ?? selectedLocation;
-      if (city && city !== "all") {
-        params.append("province", city);
-      }
+      // const city = customCity ?? selectedLocation;
+      // if (city && city !== "all") {
+      //   params.append("province", city);
+      // }
 
-      const order = customOrder ?? "amount";
-      params.append("order", order);
+      // //가격 낮은순 높은
+      // const order = customOrder ?? "amount";
+      // params.append("order", order);
 
       const url = `/api/nonpayment/items?${params.toString()}`;
       console.log("Fetching URL:", url);
