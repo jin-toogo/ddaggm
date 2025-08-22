@@ -243,6 +243,9 @@ export function HomeContent() {
       {/* Filters Section */}
       <section className="bg-muted/30 py-6">
         <div className="max-w-[1200px] mx-auto px-6">
+          <h2 className="text-xl font-semibold mb-4 text-foreground">
+            지역별 한의원 찾기
+          </h2>
           <FilterDropdowns
             selectedCity={selectedCity}
             selectedDistrict={selectedDistrict}
@@ -258,6 +261,9 @@ export function HomeContent() {
       {/* Results Section */}
       <section className="py-8">
         <div className="max-w-[1200px] mx-auto px-6">
+          <h2 className="text-xl font-semibold mb-6 text-foreground">
+            검색 결과
+          </h2>
           <ClinicList
             clinics={clinics}
             isLoading={isLoading}

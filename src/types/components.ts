@@ -45,6 +45,8 @@ export interface TreatmentFiltersProps {
   totalCount: number;
   selectedLocation?: string;
   onLocationChange?: (location: string) => void;
+  selectedSort?: string;
+  onSortChange?: (sort: string) => void;
 }
 
 export interface NonCoveredListProps {

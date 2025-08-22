@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { ArrowLeft, Phone, Clock, MapPin, Car, Info } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
 import NonPaymentItems from "@/components/NonPaymentItems";
 import BackButton from "@/components/BackButton";
+import { StructuredData } from "@/components/StructuredData";
 import { HospitalData } from "@/types";
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {
@@ -52,6 +54,52 @@ function formatTime(timeString: string | null): string {
   }
 
   return timeString;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const hospital = await getHospitalData(id);
+
+  if (!hospital) {
+    return {
+      title: "병원을 찾을 수 없습니다",
+      description: "요청하신 병원 정보를 찾을 수 없습니다.",
+    };
+  }
+
+  return {
+    title: `${hospital.name} - 한의원 정보 및 보험 적용 여부`,
+    description: `${hospital.name}의 상세 정보, 진료시간, 위치, 연락처, 비급여 진료비 정보를 확인하세요. ${hospital.province} ${hospital.district} 소재 한의원입니다.`,
+    keywords: [
+      hospital.name,
+      "한의원",
+      hospital.province,
+      hospital.district,
+      "보험적용",
+      "비급여",
+      "한방치료",
+      "진료시간"
+    ],
+    openGraph: {
+      title: `${hospital.name} - 한의원 정보`,
+      description: `${hospital.name}의 진료시간, 위치, 비급여 정보를 확인하세요.`,
+      type: "website",
+      locale: "ko_KR",
+      url: `https://ddaggm.com/hospital/${id}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${hospital.name} - 한의원 정보`,
+      description: `${hospital.name}의 진료시간, 위치, 비급여 정보를 확인하세요.`,
+    },
+    alternates: {
+      canonical: `https://ddaggm.com/hospital/${id}`,
+    },
+  };
 }
 
 export default async function HospitalDetail({
@@ -106,6 +154,7 @@ export default async function HospitalDetail({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <StructuredData type="hospital" data={hospital} />
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-4">

@@ -2,10 +2,13 @@ import React, { Suspense } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { HomeContent } from "@/components/HomeContent";
+import { StructuredData } from "@/components/StructuredData";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <StructuredData type="website" />
+      <StructuredData type="medical-business" />
       <Header />
       <Suspense
         fallback={

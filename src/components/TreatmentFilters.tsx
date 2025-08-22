@@ -11,6 +11,8 @@ export function TreatmentFilters({
   onTreatmentChange,
   selectedLocation = "all",
   onLocationChange,
+  selectedSort = "price_asc",
+  onSortChange,
 }: TreatmentFiltersProps) {
   const locationOptions = [
     { value: "all", label: "전국" },
@@ -66,18 +68,14 @@ export function TreatmentFilters({
             selectedValue={selectedLocation}
             options={locationOptions}
             onChange={(value) => onLocationChange?.(value)}
-            isDisabled={true}
-            showDevelopmentTooltip={true}
             width="w-48"
           />
 
           <DropdownFilter
             label="정렬"
-            selectedValue="price_asc"
+            selectedValue={selectedSort}
             options={sortOptions}
-            onChange={() => {}}
-            isDisabled={true}
-            showDevelopmentTooltip={true}
+            onChange={(value) => onSortChange?.(value)}
             width="w-40"
           />
         </div>

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "한의원 보험 적용 확인 - 한방 첩약 보험 정보",
   description:
     "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다. 한방 첩약 보험 적용 정보를 제공합니다.",
-  keywords: ["한의원", "보험", "한방", "첩약", "건강보험", "한의원 찾기"],
+  keywords: ["한의원", "보험", "한방", "첩약", "건강보험", "한의원 찾기", "비급여", "추나요법", "침술", "한방치료비"],
   authors: [{ name: "한의원 보험 확인 시스템" }],
   verification: {
     other: {
@@ -20,10 +20,20 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "한의원 보험 적용 확인",
-    description: "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스",
+    title: "한의원 보험 적용 확인 - 한방 첩약 보험 정보",
+    description: "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다. 비급여 진료비 정보도 함께 제공합니다.",
     type: "website",
     locale: "ko_KR",
+    url: "https://ddaggm.com",
+    siteName: "한의원 보험 적용 확인",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "한의원 보험 적용 확인",
+    description: "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스",
+  },
+  alternates: {
+    canonical: "https://ddaggm.com",
   },
 };
 

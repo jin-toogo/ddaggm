@@ -11,11 +11,12 @@ import { DEFAULT_LOCATION, ITEMS_PER_PAGE } from "@/constants";
 export function NonCoveredContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [nonCoveredItems, setNonCoveredItems] = useState<NonCoveredItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTreatment, setSelectedTreatment] = useState("chuna");
   const [selectedLocation, setSelectedLocation] = useState(DEFAULT_LOCATION);
+  const [selectedSort, setSelectedSort] = useState("price_asc");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -24,61 +25,44 @@ export function NonCoveredContent() {
 
   // URL 파라미터에서 초기 상태 설정
   useEffect(() => {
-    const query = searchParams.get('search') || '';
-    const treatment = searchParams.get('treatment') || 'chuna';
-    const location = searchParams.get('location') || DEFAULT_LOCATION;
-    
+    const query = searchParams.get("search") || "";
+    const treatment = searchParams.get("treatment") || "chuna";
+    const location = searchParams.get("location") || DEFAULT_LOCATION;
+    const sort = searchParams.get("sort") || "price_asc";
+
     setSearchQuery(query);
     setSelectedTreatment(treatment);
     setSelectedLocation(location);
+    setSelectedSort(sort);
   }, [searchParams]);
 
   // 초기 데이터 로딩
   useEffect(() => {
-    const fetchNonCoveredItems = async () => {
+    const fetchInitialData = async () => {
       try {
-        // URL 파라미터가 있으면 해당 값으로 검색, 없으면 기본값
-        const treatment = searchParams.get('treatment') || 'chuna';
-        const query = searchParams.get('search') || '';
-        
-        // 치료법에 따른 카테고리 변환
-        const category = treatmentCategories.find(cat => cat.id === treatment);
-        const categoryParam = category ? encodeURIComponent(category.searchKeyword) : '%EC%B6%94%EB%82%98';
-        
-        let url = `/api/nonpayment/items?category=${categoryParam}&page=1&limit=${ITEMS_PER_PAGE}`;
-        if (query.trim()) {
-          url += `&search=${encodeURIComponent(query.trim())}`;
-        }
+        const treatment = searchParams.get("treatment") || "chuna";
+        const query = searchParams.get("search") || "";
+        const location = searchParams.get("location") || DEFAULT_LOCATION;
+        const sort = searchParams.get("sort") || "price_asc";
 
-        const response = await fetch(url);
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Initial API Error:", response.status, errorText);
-          throw new Error(
-            `Failed to fetch initial data: ${response.status} - ${errorText}`
-          );
-        }
-        const result = await response.json();
-
-        setNonCoveredItems(result.data || []);
-        setCurrentPage(result.pagination?.currentPage || 1);
-        setTotalPages(result.pagination?.totalPages || 0);
-        setTotalCount(result.pagination?.totalCount || 0);
+        await fetchFilteredItems(1, query, treatment, location, sort);
       } catch (error) {
-        console.error("Failed to load non-covered items:", error);
+        console.error("Failed to load initial data:", error);
       } finally {
         setIsInitialLoading(false);
       }
     };
 
-    fetchNonCoveredItems();
-  }, [searchParams, treatmentCategories]);
+    fetchInitialData();
+  }, []);
 
   // 필터링된 데이터 가져오기
   const fetchFilteredItems = async (
     page = 1,
     customSearchQuery?: string,
-    customTreatment?: string
+    customTreatment?: string,
+    customLocation?: string,
+    customSort?: string
   ) => {
     try {
       setIsLoading(true);
@@ -103,6 +87,18 @@ export function NonCoveredContent() {
       const query = customSearchQuery ?? searchQuery;
       if (query?.trim()) {
         params.append("search", query.trim());
+      }
+
+      // 지역 필터
+      const location = customLocation ?? selectedLocation;
+      if (location && location !== "all") {
+        params.append("location", location);
+      }
+
+      // 정렬 필터
+      const sort = customSort ?? selectedSort;
+      if (sort) {
+        params.append("sortBy", sort);
       }
 
       const url = `/api/nonpayment/items?${params.toString()}`;
@@ -135,43 +131,83 @@ export function NonCoveredContent() {
   };
 
   // URL 업데이트 함수
-  const updateURL = (newSearch?: string, newTreatment?: string, newLocation?: string) => {
+  const updateURL = (
+    newSearch?: string,
+    newTreatment?: string,
+    newLocation?: string,
+    newSort?: string
+  ) => {
     const params = new URLSearchParams();
-    
+
     const search = newSearch ?? searchQuery;
     const treatment = newTreatment ?? selectedTreatment;
     const location = newLocation ?? selectedLocation;
-    
+    const sort = newSort ?? selectedSort;
+
     if (search && search.trim()) {
-      params.set('search', search.trim());
+      params.set("search", search.trim());
     }
-    if (treatment && treatment !== 'chuna') {
-      params.set('treatment', treatment);
+    if (treatment && treatment !== "chuna") {
+      params.set("treatment", treatment);
     }
     if (location && location !== DEFAULT_LOCATION) {
-      params.set('location', location);
+      params.set("location", location);
     }
-    
-    const newURL = params.toString() ? `/non-covered?${params.toString()}` : '/non-covered';
+    if (sort && sort !== "price_asc") {
+      params.set("sort", sort);
+    }
+
+    const newURL = params.toString()
+      ? `/non-covered?${params.toString()}`
+      : "/non-covered";
     router.replace(newURL, { scroll: false });
   };
 
   const handleTreatmentChange = async (treatment: string) => {
     setSelectedTreatment(treatment);
     updateURL(undefined, treatment);
-    await fetchFilteredItems(1, searchQuery, treatment);
+    await fetchFilteredItems(
+      1,
+      searchQuery,
+      treatment,
+      selectedLocation,
+      selectedSort
+    );
   };
 
   const handleLocationChange = async (location: string) => {
     setSelectedLocation(location);
     updateURL(undefined, undefined, location);
-    // TODO: 위치 기반 필터링 구현 시 fetchFilteredItems 호출
-    console.log("Location changed to:", location);
+    await fetchFilteredItems(
+      1,
+      searchQuery,
+      selectedTreatment,
+      location,
+      selectedSort
+    );
+  };
+
+  const handleSortChange = async (sort: string) => {
+    setSelectedSort(sort);
+    updateURL(undefined, undefined, undefined, sort);
+    await fetchFilteredItems(
+      1,
+      searchQuery,
+      selectedTreatment,
+      selectedLocation,
+      sort
+    );
   };
 
   const handlePageChange = async (page: number) => {
     if (page < 1) return;
-    await fetchFilteredItems(page);
+    await fetchFilteredItems(
+      page,
+      searchQuery,
+      selectedTreatment,
+      selectedLocation,
+      selectedSort
+    );
   };
 
   if (isInitialLoading) {
@@ -194,10 +230,10 @@ export function NonCoveredContent() {
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-medium text-foreground mb-4">
-              한의원 비급여 진료 항목을 찾아보세요
+              한의원 비급여 진료 가격을 확인해보세요
             </h1>
             <p className="text-lg text-muted-foreground">
-              치료법별로 분류된 비급여 진료 항목과 가격을 비교해보세요
+              치료법별로 분류된 비급여 진료 항목과 가격을 확인해보세요
             </p>
           </div>
         </div>
@@ -206,6 +242,9 @@ export function NonCoveredContent() {
       {/* Treatment Filters Section */}
       <section className="bg-white">
         <div className="max-w-[1200px] mx-auto">
+          <h2 className="text-xl font-semibold px-6 pt-6 pb-2 text-foreground">
+            치료법별 분류
+          </h2>
           <TreatmentFilters
             categories={treatmentCategories}
             selectedTreatment={selectedTreatment}
@@ -213,6 +252,8 @@ export function NonCoveredContent() {
             totalCount={totalCount}
             selectedLocation={selectedLocation}
             onLocationChange={handleLocationChange}
+            selectedSort={selectedSort}
+            onSortChange={handleSortChange}
           />
         </div>
       </section>
@@ -220,6 +261,9 @@ export function NonCoveredContent() {
       {/* Results Section */}
       <section className="py-8">
         <div className="max-w-[1200px] mx-auto px-6">
+          <h2 className="text-xl font-semibold mb-6 text-foreground">
+            비급여 진료 항목
+          </h2>
           <NonCoveredList
             items={nonCoveredItems}
             isLoading={isLoading}

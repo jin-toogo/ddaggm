@@ -6,11 +6,21 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const search = searchParams.get("search");
+    const location = searchParams.get("location");
+    const sortBy = searchParams.get("sortBy") || "price_asc";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
     const skip = (page - 1) * limit;
 
-    console.log("API Filter params:", { category, search, page, limit });
+    console.log("API Filter params:", {
+      requestUrl: request.url,
+      category,
+      search,
+      location,
+      sortBy,
+      page,
+      limit,
+    });
 
     // 필터 조건
     const where: any = {
@@ -69,6 +79,40 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // 지역 필터링
+    if (location && location !== "all") {
+      const locationConditions = [
+        {
+          hospital: {
+            province: {
+              contains: location,
+            },
+          },
+        },
+      ];
+
+      if (where.AND) {
+        where.AND.push({ OR: locationConditions });
+      } else if (where.OR) {
+        where.AND = [{ OR: where.OR }, { OR: locationConditions }];
+        delete where.OR;
+      } else {
+        where.OR = locationConditions;
+      }
+    }
+    console.log("where!!! :>> ", where);
+    // 정렬 옵션 설정
+    let orderBy: any[] = [];
+    switch (sortBy) {
+      case "price_desc":
+        orderBy = [{ amount: "desc" }, { treatmentName: "asc" }];
+        break;
+      case "price_asc":
+      default:
+        orderBy = [{ amount: "asc" }, { treatmentName: "asc" }];
+        break;
+    }
+
     // 비급여 항목과 병원 정보 조회
     const nonPaymentItems = await prisma.hospitalNonPaymentItem.findMany({
       select: {
@@ -89,14 +133,7 @@ export async function GET(request: NextRequest) {
         },
       },
       where,
-      orderBy: [
-        {
-          amount: "asc",
-        },
-        {
-          treatmentName: "asc",
-        },
-      ],
+      orderBy,
       skip,
       take: limit,
     });
