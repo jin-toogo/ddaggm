@@ -3,13 +3,7 @@ import { Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { searchExamples } from "@/lib/clinics";
-
-interface SearchBarProps {
-  onSearch: (query: string) => void;
-  isLoading: boolean;
-  onClear?: () => void;
-  placeholder?: string;
-}
+import { SearchBarProps } from "@/types";
 
 export function SearchBar({ onSearch, isLoading, onClear, placeholder = "한의원명을 입력하세요..." }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState("");

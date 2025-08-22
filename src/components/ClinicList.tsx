@@ -1,12 +1,6 @@
 import React from "react";
 import { ClinicListItem } from "./ClinicListItem";
-import { Clinic } from "@/types/clinics";
-
-interface ClinicListProps {
-  clinics: Clinic[];
-  isLoading: boolean;
-  searchQuery: string;
-}
+import { ClinicListProps } from "@/types";
 
 export function ClinicList({
   clinics,

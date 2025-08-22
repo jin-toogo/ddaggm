@@ -1,14 +1,6 @@
 import React from "react";
-
-interface FilterDropdownsProps {
-  selectedCity: string;
-  selectedDistrict: string;
-  onCityChange: (city: string) => void;
-  onDistrictChange: (district: string) => void;
-  totalCount: number;
-  cities: string[];
-  districts: string[];
-}
+import { DropdownFilter } from "@/components/ui/DropdownFilter";
+import { FilterDropdownsProps } from "@/types";
 
 export function FilterDropdowns({
   selectedCity,
@@ -19,49 +11,44 @@ export function FilterDropdowns({
   cities,
   districts,
 }: FilterDropdownsProps) {
+  const cityOptions = [
+    { value: "all", label: "전체" },
+    ...cities.map(city => ({ value: city, label: city }))
+  ];
+
+  const districtOptions = [
+    { value: "all", label: "전체" },
+    ...districts.map(district => ({ value: district, label: district }))
+  ];
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <label htmlFor="city" className="text-sm font-medium text-foreground">
+          <label className="text-sm font-medium text-foreground">
             도시:
           </label>
-          <select
-            id="city"
-            value={selectedCity}
-            onChange={(e) => onCityChange(e.target.value)}
-            className="px-3 py-2 border border-border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="all">전체</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
+          <DropdownFilter
+            label="도시 선택"
+            selectedValue={selectedCity}
+            options={cityOptions}
+            onChange={onCityChange}
+            width="w-32"
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          <label
-            htmlFor="district"
-            className="text-sm font-medium text-foreground"
-          >
+          <label className="text-sm font-medium text-foreground">
             구/군:
           </label>
-          <select
-            id="district"
-            value={selectedDistrict}
-            onChange={(e) => onDistrictChange(e.target.value)}
-            className="px-3 py-2 border border-border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            disabled={selectedCity === "all"}
-          >
-            <option value="all">전체</option>
-            {districts.map((district) => (
-              <option key={district} value={district}>
-                {district}
-              </option>
-            ))}
-          </select>
+          <DropdownFilter
+            label="구/군 선택"
+            selectedValue={selectedDistrict}
+            options={districtOptions}
+            onChange={onDistrictChange}
+            isDisabled={selectedCity === "all"}
+            width="w-32"
+          />
         </div>
       </div>
     </div>

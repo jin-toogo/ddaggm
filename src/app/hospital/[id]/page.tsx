@@ -3,65 +3,7 @@ import { ArrowLeft, Phone, Clock, MapPin, Car, Info } from "lucide-react";
 import Link from "next/link";
 import NonPaymentItems from "@/components/NonPaymentItems";
 import BackButton from "@/components/BackButton";
-
-interface HospitalData {
-  id: number;
-  encryptedCode: string;
-  name: string;
-  type: string;
-  province: string;
-  district: string;
-  dong: string | null;
-  postalCode: string | null;
-  address: string;
-  latitude: number | null;
-  longitude: number | null;
-  phone: string | null;
-  website: string | null;
-  establishedDate: string | null;
-  totalDoctors: number | null;
-  insurance: boolean;
-  locationDetails?: {
-    landmark: string | null;
-    direction: string | null;
-    distance: string | null;
-    parkingSpaces: number | null;
-    parkingFeeRequired: string | null;
-    parkingNotes: string | null;
-  };
-  operatingHours?: {
-    sundayInfo: string | null;
-    holidayInfo: string | null;
-    lunchWeekday: string | null;
-    lunchSaturday: string | null;
-    receptionWeekday: string | null;
-    receptionSaturday: string | null;
-    sunStart: string | null;
-    sunEnd: string | null;
-    monStart: string | null;
-    monEnd: string | null;
-    tueStart: string | null;
-    tueEnd: string | null;
-    wedStart: string | null;
-    wedEnd: string | null;
-    thuStart: string | null;
-    thuEnd: string | null;
-    friStart: string | null;
-    friEnd: string | null;
-    satStart: string | null;
-    satEnd: string | null;
-  };
-  nonPaymentItems?: NonPaymentItem[];
-}
-
-interface NonPaymentItem {
-  id: number;
-  npayCode: string | null;
-  category: string | null;
-  treatmentName: string | null;
-  amount: number | null;
-  yadmNm: string | null;
-}
+import { HospitalData } from "@/types";
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {
   try {

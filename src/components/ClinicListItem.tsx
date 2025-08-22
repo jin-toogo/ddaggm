@@ -1,12 +1,8 @@
 import React from "react";
 import { ExternalLink, MapPin } from "lucide-react";
-import { Clinic } from "@/types/clinics";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-
-interface ClinicListItemProps {
-  clinic: Clinic;
-}
+import { ClinicListItemProps } from "@/types";
 
 export function ClinicListItem({ clinic }: ClinicListItemProps) {
   const handleNaverSearch = () => {

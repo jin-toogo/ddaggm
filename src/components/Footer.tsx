@@ -8,7 +8,7 @@ export function Footer() {
         <div className="grid md:grid-cols-3 gap-8">
           <div>
             <h3 className="font-semibold text-foreground mb-4">
-              DDaGGm&nbsp;따끔
+              DDaggm&nbsp;따끔
             </h3>
             <p className="text-sm text-muted-foreground">
               한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다.

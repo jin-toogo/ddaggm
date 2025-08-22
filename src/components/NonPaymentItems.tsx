@@ -2,19 +2,7 @@
 
 import { useState } from "react";
 import { DollarSign, ChevronDown, ChevronUp } from "lucide-react";
-
-interface NonPaymentItem {
-  id: number;
-  npayCode: string | null;
-  category: string | null;
-  treatmentName: string | null;
-  amount: number | null;
-  yadmNm: string | null;
-}
-
-interface NonPaymentItemsProps {
-  items: NonPaymentItem[];
-}
+import { NonPaymentItemsProps } from "@/types";
 
 export default function NonPaymentItems({ items }: NonPaymentItemsProps) {
   const [showAll, setShowAll] = useState(false);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
@@ -9,11 +10,13 @@ import { ClinicList } from "@/components/ClinicList";
 import { Footer } from "@/components/Footer";
 import { Clinic } from "@/types/clinics";
 import { loadClinics, cities, districts } from "@/lib/clinics";
-
-const ITEMS_PER_PAGE = 20;
+import { ITEMS_PER_PAGE } from "@/constants";
 
 export default function Home() {
   const [clinics, setClinics] = useState<Clinic[]>([]);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
@@ -24,14 +27,30 @@ export default function Home() {
   const [totalCount, setTotalCount] = useState(0);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
+  // URL 파라미터에서 초기 상태 설정
+  useEffect(() => {
+    const query = searchParams.get("q") || "";
+    const city = searchParams.get("city") || "all";
+    const district = searchParams.get("district") || "all";
+
+    setSearchQuery(query);
+    setSelectedCity(city);
+    setSelectedDistrict(district);
+  }, [searchParams]);
+
   // 초기 데이터 로딩
   useEffect(() => {
     const fetchClinics = async () => {
       try {
+        // URL 파라미터가 있으면 해당 값으로 검색, 없으면 기본값
+        const query = searchParams.get("q") || undefined;
+        const city = searchParams.get("city") || undefined;
+        const district = searchParams.get("district") || undefined;
+
         const data = await loadClinics(
-          undefined,
-          undefined,
-          undefined,
+          query,
+          city === "all" ? undefined : city,
+          district === "all" ? undefined : district,
           1,
           ITEMS_PER_PAGE
         );
@@ -75,22 +94,10 @@ export default function Home() {
         ITEMS_PER_PAGE
       );
 
-      console.log(
-        "fetchFilteredClinics result:",
-        result,
-        "type:",
-        typeof result,
-        "isArray:",
-        Array.isArray(result)
-      );
-
       // API 응답이 페이지네이션 정보를 포함하는지 확인
       if (Array.isArray(result)) {
         // 이전 버전 호환성 (배열 반환)
-        console.log(
-          "Setting clinics as array from fetchFilteredClinics:",
-          result
-        );
+
         setClinics(result);
         setCurrentPage(page);
         if (result.length < ITEMS_PER_PAGE) {
@@ -101,10 +108,7 @@ export default function Home() {
         setTotalCount(result.length + (page - 1) * ITEMS_PER_PAGE);
       } else {
         // 새 버전 (페이지네이션 정보 포함)
-        console.log(
-          "Setting clinics from result.data in fetchFilteredClinics:",
-          result.data
-        );
+
         setClinics(result.data || []);
         setCurrentPage(result.pagination?.currentPage || page);
         setTotalPages(result.pagination?.totalPages || 0);
@@ -145,13 +149,41 @@ export default function Home() {
     await fetchFilteredClinics(page);
   };
 
+  // URL 업데이트 함수
+  const updateURL = (
+    newQuery?: string,
+    newCity?: string,
+    newDistrict?: string
+  ) => {
+    const params = new URLSearchParams();
+
+    const query = newQuery ?? searchQuery;
+    const city = newCity ?? selectedCity;
+    const district = newDistrict ?? selectedDistrict;
+
+    if (query && query.trim()) {
+      params.set("q", query.trim());
+    }
+    if (city && city !== "all") {
+      params.set("city", city);
+    }
+    if (district && district !== "all") {
+      params.set("district", district);
+    }
+
+    const newURL = params.toString() ? `/?${params.toString()}` : "/";
+    router.replace(newURL, { scroll: false });
+  };
+
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
+    updateURL(query);
     await fetchFilteredClinics(1, query);
   };
 
   const handleClearSearch = async () => {
     setSearchQuery("");
+    updateURL("");
     // 검색어를 비운 상태로 초기 데이터 로드
     const data = await loadClinics(
       undefined,
@@ -169,11 +201,13 @@ export default function Home() {
   const handleCityChange = async (city: string) => {
     setSelectedCity(city);
     setSelectedDistrict("all");
+    updateURL(undefined, city, "all");
     await fetchFilteredClinics(1, searchQuery, city, "all");
   };
 
   const handleDistrictChange = async (district: string) => {
     setSelectedDistrict(district);
+    updateURL(undefined, undefined, district);
     await fetchFilteredClinics(1, searchQuery, selectedCity, district);
   };
 

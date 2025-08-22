@@ -1,45 +1,56 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Header } from "@/components/Header";
-import { SearchBar } from "@/components/SearchBar";
 import { Footer } from "@/components/Footer";
 import { TreatmentFilters } from "@/components/TreatmentFilters";
 import { NonCoveredList } from "@/components/NonCoveredList";
 import { treatmentCategories } from "@/lib/clinics";
-
-const ITEMS_PER_PAGE = 20;
-
-interface NonCoveredItem {
-  id: number;
-  treatmentName: string;
-  category: string;
-  amount: number;
-  clinicName: string;
-  npayCode: string;
-  yadmNm: string;
-  hospitalId: number;
-  province: string;
-  district: string;
-}
+import { NonCoveredItem } from "@/types";
+import { DEFAULT_LOCATION, ITEMS_PER_PAGE } from "@/constants";
 
 export default function NonCoveredPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [nonCoveredItems, setNonCoveredItems] = useState<NonCoveredItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTreatment, setSelectedTreatment] = useState("chuna");
-  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedLocation, setSelectedLocation] = useState(DEFAULT_LOCATION);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
+  // URL 파라미터에서 초기 상태 설정
+  useEffect(() => {
+    const query = searchParams.get('search') || '';
+    const treatment = searchParams.get('treatment') || 'chuna';
+    const location = searchParams.get('location') || DEFAULT_LOCATION;
+    
+    setSearchQuery(query);
+    setSelectedTreatment(treatment);
+    setSelectedLocation(location);
+  }, [searchParams]);
+
   // 초기 데이터 로딩
   useEffect(() => {
     const fetchNonCoveredItems = async () => {
       try {
-        const url = `/api/nonpayment/items?category=%EC%B6%94%EB%82%98&page=1&limit=${ITEMS_PER_PAGE}`;
-        console.log("Initial fetch URL:", url);
+        // URL 파라미터가 있으면 해당 값으로 검색, 없으면 기본값
+        const treatment = searchParams.get('treatment') || 'chuna';
+        const query = searchParams.get('search') || '';
+        
+        // 치료법에 따른 카테고리 변환
+        const category = treatmentCategories.find(cat => cat.id === treatment);
+        const categoryParam = category ? encodeURIComponent(category.searchKeyword) : '%EC%B6%94%EB%82%98';
+        
+        let url = `/api/nonpayment/items?category=${categoryParam}&page=1&limit=${ITEMS_PER_PAGE}`;
+        if (query.trim()) {
+          url += `&search=${encodeURIComponent(query.trim())}`;
+        }
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -63,7 +74,7 @@ export default function NonCoveredPage() {
     };
 
     fetchNonCoveredItems();
-  }, []);
+  }, [searchParams, treatmentCategories]);
 
   // 필터링된 데이터 가져오기
   const fetchFilteredItems = async (
@@ -84,13 +95,10 @@ export default function NonCoveredPage() {
       // 치료법 필터 - 실제 카테고리명으로 변환
       const treatment = customTreatment ?? selectedTreatment;
       if (treatment && treatment !== "all") {
-        console.log("treatment :>> ", treatment);
-
         const category = treatmentCategories.find(
           (cat) => cat.id === treatment
         );
         if (category) {
-          console.log("Selected category:", category.name);
           params.append("category", category.searchKeyword);
         }
       }
@@ -111,7 +119,6 @@ export default function NonCoveredPage() {
       // params.append("order", order);
 
       const url = `/api/nonpayment/items?${params.toString()}`;
-      console.log("Fetching URL:", url);
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -140,23 +147,38 @@ export default function NonCoveredPage() {
     }
   };
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    await fetchFilteredItems(1, query);
-  };
-
-  const handleClearSearch = async () => {
-    setSearchQuery("");
-    await fetchFilteredItems(1, "");
+  // URL 업데이트 함수
+  const updateURL = (newSearch?: string, newTreatment?: string, newLocation?: string) => {
+    const params = new URLSearchParams();
+    
+    const search = newSearch ?? searchQuery;
+    const treatment = newTreatment ?? selectedTreatment;
+    const location = newLocation ?? selectedLocation;
+    
+    if (search && search.trim()) {
+      params.set('search', search.trim());
+    }
+    if (treatment && treatment !== 'chuna') {
+      params.set('treatment', treatment);
+    }
+    if (location && location !== DEFAULT_LOCATION) {
+      params.set('location', location);
+    }
+    
+    const newURL = params.toString() ? `/non-covered?${params.toString()}` : '/non-covered';
+    router.replace(newURL, { scroll: false });
   };
 
   const handleTreatmentChange = async (treatment: string) => {
     setSelectedTreatment(treatment);
+    updateURL(undefined, treatment);
     await fetchFilteredItems(1, searchQuery, treatment);
   };
 
   const handleLocationChange = async (location: string) => {
     setSelectedLocation(location);
+    updateURL(undefined, undefined, location);
+    // TODO: 위치 기반 필터링 구현 시 fetchFilteredItems 호출
     console.log("Location changed to:", location);
   };
 

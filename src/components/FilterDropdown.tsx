@@ -8,14 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-
-interface FilterDropdownsProps {
-  selectedCity: string;
-  selectedDistrict: string;
-  onCityChange: (city: string) => void;
-  onDistrictChange: (district: string) => void;
-  totalCount: number;
-}
+import { FilterDropdownsProps } from "@/types";
 
 export function FilterDropdowns({
   selectedCity,

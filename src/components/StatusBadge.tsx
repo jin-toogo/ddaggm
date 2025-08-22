@@ -1,9 +1,6 @@
 import React from "react";
 import { Badge } from "./ui/badge";
-
-interface StatusBadgeProps {
-  status: "confirmed" | "unknown";
-}
+import { StatusBadgeProps } from "@/types";
 
 export function StatusBadge({ status }: StatusBadgeProps) {
   if (status === "confirmed") {

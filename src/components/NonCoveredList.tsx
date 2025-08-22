@@ -3,36 +3,7 @@
 import React from "react";
 import { Building2 } from "lucide-react";
 import Link from "next/link";
-
-interface NonCoveredItem {
-  id: number;
-  treatmentName: string;
-  category: string;
-  amount: number;
-  clinicName: string;
-  npayCode: string;
-  yadmNm: string;
-  hospitalId: number;
-  province: string;
-  district: string;
-}
-
-interface TreatmentCategory {
-  id: string;
-  name: string;
-  description: string;
-  dataCount: number;
-  percentage: number;
-  keywords: string[];
-}
-
-interface NonCoveredListProps {
-  items: NonCoveredItem[];
-  isLoading: boolean;
-  searchQuery: string;
-  selectedTreatment: string;
-  treatmentCategories: TreatmentCategory[];
-}
+import { NonCoveredListProps } from "@/types";
 
 export function NonCoveredList({
   items,
