@@ -242,9 +242,6 @@ export function NonCoveredContent() {
       {/* Treatment Filters Section */}
       <section className="bg-white">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="text-xl font-semibold px-6 pt-6 pb-2 text-foreground">
-            치료법별 분류
-          </h2>
           <TreatmentFilters
             categories={treatmentCategories}
             selectedTreatment={selectedTreatment}
@@ -261,9 +258,6 @@ export function NonCoveredContent() {
       {/* Results Section */}
       <section className="py-8">
         <div className="max-w-[1200px] mx-auto px-6">
-          <h2 className="text-xl font-semibold mb-6 text-foreground">
-            비급여 진료 항목
-          </h2>
           <NonCoveredList
             items={nonCoveredItems}
             isLoading={isLoading}

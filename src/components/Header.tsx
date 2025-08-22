@@ -17,19 +17,19 @@ export function Header() {
           </div>
           <nav className="hidden md:flex items-center space-x-6 absolute left-1/2 transform -translate-x-1/2 ">
             <Link
-              href="/"
+              href="/herbal-insurance"
               className={`text-base hover:text-foreground py-4.5 transition-colors ${
-                pathname === "/"
+                pathname === "/herba-insurance"
                   ? "text-foreground font-semibold border-b-2 border-primary"
                   : "text-muted-foreground"
               }`}
             >
-              홈
+              첩약 보험
             </Link>
             <Link
               href="/non-covered"
               className={`text-base hover:text-foreground py-4.5 transition-colors ${
-                pathname === "/non-covered"
+                pathname === "/non-covered" || pathname === "/"
                   ? "text-foreground font-semibold border-b-2 border-primary"
                   : "text-muted-foreground"
               }`}
