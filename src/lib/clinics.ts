@@ -46,17 +46,8 @@ export async function loadClinics(
       throw new Error("Failed to fetch clinics");
     }
     const result = await response.json();
-    console.log(
-      "loadClinics API result:",
-      result,
-      "type:",
-      typeof result,
-      "isArray:",
-      Array.isArray(result)
-    );
 
     // 전체 데이터 로드인 경우 (페이지네이션 없음)
-
     return result;
   } catch (error) {
     console.error("Error loading clinics:", error);

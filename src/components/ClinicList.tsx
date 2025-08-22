@@ -7,8 +7,6 @@ export function ClinicList({
   isLoading,
   searchQuery,
 }: ClinicListProps) {
-  console.log("ClinicList received clinics:", clinics, "type:", typeof clinics, "isArray:", Array.isArray(clinics));
-  
   // 안전장치: clinics가 배열이 아닌 경우 빈 배열로 처리
   const safeClinic = Array.isArray(clinics) ? clinics : [];
   if (isLoading) {

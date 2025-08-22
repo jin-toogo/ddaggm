@@ -12,16 +12,6 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20");
     const skip = (page - 1) * limit;
 
-    console.log("API Filter params:", {
-      requestUrl: request.url,
-      category,
-      search,
-      location,
-      sortBy,
-      page,
-      limit,
-    });
-
     // 필터 조건
     const where: any = {
       treatmentName: {
@@ -100,7 +90,7 @@ export async function GET(request: NextRequest) {
         where.OR = locationConditions;
       }
     }
-    console.log("where!!! :>> ", where);
+
     // 정렬 옵션 설정
     let orderBy: any[] = [];
     switch (sortBy) {
@@ -151,14 +141,7 @@ export async function GET(request: NextRequest) {
         where: { category: { not: null } },
         take: 20,
       });
-      console.log(
-        "Available categories:",
-        distinctCategories.map((c) => c.category)
-      );
     }
-
-    console.log("Where condition:", JSON.stringify(where, null, 2));
-    console.log("Found items count:", nonPaymentItems.length);
 
     // 데이터 변환
     const items = nonPaymentItems.map((item) => ({

@@ -20,7 +20,6 @@ async function getHospitalData(id: string): Promise<HospitalData | null> {
       return null;
     }
     const result = await response.json();
-    console.log("API response:", result);
     // API가 { data: hospital } 형태로 반환하므로 data 속성에서 추출
     return result.data || result;
   } catch (error) {
@@ -82,7 +81,7 @@ export async function generateMetadata({
       "보험적용",
       "비급여",
       "한방치료",
-      "진료시간"
+      "진료시간",
     ],
     openGraph: {
       title: `${hospital.name} - 한의원 정보`,
@@ -109,7 +108,6 @@ export default async function HospitalDetail({
 }) {
   const { id } = await params;
   const hospital = await getHospitalData(id);
-  console.log("hospital :>> ", hospital);
   if (!hospital) {
     notFound();
   }
