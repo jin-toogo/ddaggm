@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { SearchBar } from "@/components/SearchBar";
 import { FilterDropdowns } from "@/components/FilterDropdowns";
 import { ClinicList } from "@/components/ClinicList";
@@ -167,7 +166,9 @@ export function HomeContent() {
       params.set("district", district);
     }
 
-    const newURL = params.toString() ? `/?${params.toString()}` : "/";
+    const newURL = params.toString()
+      ? `/herbal-insurance?${params.toString()}`
+      : "/herbal-insurance";
     router.replace(newURL, { scroll: false });
   };
 
