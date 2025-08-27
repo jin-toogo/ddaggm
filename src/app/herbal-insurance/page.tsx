@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { HomeContent } from "@/components/HomeContent";
+import { HerbalInsurance } from "@/components/herbalInsurance";
 import { StructuredData } from "@/components/StructuredData";
 
 export default function Home() {
@@ -20,7 +20,7 @@ export default function Home() {
           </main>
         }
       >
-        <HomeContent />
+        <HerbalInsurance />
       </Suspense>
       <Footer />
     </div>

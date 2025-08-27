@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,10 +27,10 @@ export async function GET(request: NextRequest) {
         treatmentName: true,
         category: true,
       },
-      distinct: ['treatmentName'],
+      distinct: ["treatmentName"],
       where,
       orderBy: {
-        treatmentName: 'asc',
+        treatmentName: "asc",
       },
       skip,
       take: limit,
@@ -43,11 +43,11 @@ export async function GET(request: NextRequest) {
 
     // null이 아닌 treatmentName만 필터링
     const treatmentList = treatments
-      .map(item => ({
+      .map((item) => ({
         treatmentName: item.treatmentName,
         category: item.category,
       }))
-      .filter(item => item.treatmentName !== null);
+      .filter((item) => item.treatmentName !== null);
 
     const totalPages = Math.ceil(totalCount / limit);
 

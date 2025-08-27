@@ -8,7 +8,7 @@ export const searchExamples = [
 
 // API 응답 타입 정의
 interface ClinicsResponse {
-  data: Clinic[];
+  clinics: Clinic[];
   pagination: {
     currentPage: number;
     totalPages: number;
@@ -52,7 +52,7 @@ export async function loadClinics(
   } catch (error) {
     console.error("Error loading clinics:", error);
     return {
-      data: [],
+      clinics: [],
       pagination: {
         currentPage: 0,
         totalPages: 0,

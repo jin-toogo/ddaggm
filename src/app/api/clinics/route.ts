@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const province = searchParams.get("province");
     const district = searchParams.get("district");
     const insurance = searchParams.get("insurance");
+    const category = searchParams.get("category");
 
     const skip = (page - 1) * limit;
 
@@ -33,9 +34,19 @@ export async function GET(request: NextRequest) {
       where.district = district;
     }
 
+    if (category) {
+      where.clinicCategories = {
+        some: {
+          category: {
+            slug: category,
+          },
+        },
+      };
+    }
+
     // 총 개수 조회
     const totalCount = await prisma.hospital.count({ where });
-    
+
     // 병원 목록 조회 (Clinic 인터페이스에 맞게 변환)
     const hospitals = await prisma.hospital.findMany({
       where,
@@ -48,6 +59,7 @@ export async function GET(request: NextRequest) {
         phone: true,
         insurance: true,
         type: true,
+        website: true,
       },
       skip,
       take: limit,
@@ -67,17 +79,17 @@ export async function GET(request: NextRequest) {
         phone: string | null;
         insurance: boolean;
         type: string;
+        website: string | null;
       }) => ({
-        id: hospital.id.toString(),
+        id: hospital.id,
         name: hospital.name,
         address: hospital.address,
-        city: hospital.province,
-        city_kor: hospital.province,
+        province: hospital.province,
         district: hospital.district,
-        district_kor: hospital.district,
         phone: hospital.phone,
         insurance: hospital.insurance,
-        status: "active",
+        type: hospital.type,
+        website: hospital.website,
       })
     );
 
@@ -87,7 +99,7 @@ export async function GET(request: NextRequest) {
     const hasPrevPage = page > 1;
 
     return NextResponse.json({
-      data: clinics,
+      clinics: clinics,
       pagination: {
         currentPage: page,
         totalPages,

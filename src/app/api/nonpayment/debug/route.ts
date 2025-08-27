@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,13 +14,13 @@ export async function GET(request: NextRequest) {
       },
       take: 50,
       orderBy: {
-        treatmentName: 'asc',
+        treatmentName: "asc",
       },
     });
 
     // 카테고리별 그룹화
     const categories = await prisma.hospitalNonPaymentItem.groupBy({
-      by: ['category'],
+      by: ["category"],
       where: {
         category: { not: null },
       },
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: {
         _count: {
-          category: 'desc',
+          category: "desc",
         },
       },
       take: 20,

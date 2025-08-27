@@ -1,73 +1,72 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    
+    const { searchParams } = new URL(request.url);
+
     // 쿼리 파라미터
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
-    const province = searchParams.get('province')
-    const district = searchParams.get('district')
-    const type = searchParams.get('type')
-    const insurance = searchParams.get('insurance')
-    
-    const skip = (page - 1) * limit
-    
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
+    const province = searchParams.get("province");
+    const district = searchParams.get("district");
+    const type = searchParams.get("type");
+    const insurance = searchParams.get("insurance");
+
+    const skip = (page - 1) * limit;
+
     // 필터 조건 구성
-    const where: any = {}
-    
+    const where: any = {};
+
     if (province) {
-      where.province = province
+      where.province = province;
     }
-    
+
     if (district) {
-      where.district = district
+      where.district = district;
     }
-    
+
     if (type) {
       where.type = {
-        contains: type
-      }
+        contains: type,
+      };
     }
-    
+
     if (insurance !== null && insurance !== undefined) {
-      where.insurance = insurance === 'true'
+      where.insurance = insurance === "true";
     }
-    
+
     // 병원 목록 조회
     const [hospitals, total] = await Promise.all([
       prisma.hospital.findMany({
         where,
         include: {
           locationDetails: true,
-          operatingHours: true
+          operatingHours: true,
         },
         skip,
         take: limit,
         orderBy: {
-          name: 'asc'
-        }
+          name: "asc",
+        },
       }),
-      prisma.hospital.count({ where })
-    ])
-    
+      prisma.hospital.count({ where }),
+    ]);
+
     return NextResponse.json({
       data: hospitals,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
-    })
-    
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
-    console.error('Hospital API Error:', error)
+    console.error("Hospital API Error:", error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: "Internal Server Error" },
       { status: 500 }
-    )
+    );
   }
 }

@@ -5,11 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SearchBar } from "@/components/SearchBar";
 import { FilterDropdowns } from "@/components/FilterDropdowns";
 import { ClinicList } from "@/components/ClinicList";
+import CategoryGrid from "@/components/CategoryGrid";
 import { Clinic } from "@/types/clinics";
 import { loadClinics, cities, districts } from "@/lib/clinics";
 import { ITEMS_PER_PAGE } from "@/constants";
 
-export function HomeContent() {
+export function HerbalInsurance() {
   const [clinics, setClinics] = useState<Clinic[]>([]);
 
   const router = useRouter();
@@ -59,7 +60,7 @@ export function HomeContent() {
           setTotalCount(data.length);
         } else {
           // 새 버전 (페이지네이션 정보 포함)
-          setClinics(data.data || []);
+          setClinics(data.clinics || []);
           setCurrentPage(data.pagination?.currentPage || 1);
           setTotalPages(data.pagination?.totalPages || 0);
           setTotalCount(data.pagination?.totalCount || 0);
@@ -104,7 +105,7 @@ export function HomeContent() {
         setTotalCount(result.length + (page - 1) * ITEMS_PER_PAGE);
       } else {
         // 새 버전 (페이지네이션 정보 포함)
-        setClinics(result.data || []);
+        setClinics(result.clinics || []);
         setCurrentPage(result.pagination?.currentPage || page);
         setTotalPages(result.pagination?.totalPages || 0);
         setTotalCount(result.pagination?.totalCount || 0);
@@ -189,7 +190,7 @@ export function HomeContent() {
       1,
       ITEMS_PER_PAGE
     );
-    setClinics(data.data);
+    setClinics(data.clinics);
     setTotalPages(data.pagination.totalPages);
     setTotalCount(data.pagination.totalCount);
     setCurrentPage(1);
@@ -223,7 +224,7 @@ export function HomeContent() {
     <main className="flex-1">
       {/* Hero Section */}
       <section className="bg-white py-12 md:py-16">
-        <div className="max-w-[1200px] mx-auto px-6">
+        <div className="max-w-[1000px] mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-medium text-foreground mb-4">
               한방 첩약 보험 적용 여부를 검색해보세요
@@ -243,7 +244,7 @@ export function HomeContent() {
 
       {/* Filters Section */}
       <section className="bg-muted/30 py-6">
-        <div className="max-w-[1200px] mx-auto px-6">
+        <div className="max-w-[1000px] mx-auto px-6">
           <h2 className="text-xl font-semibold mb-4 text-foreground">
             지역별 한의원 찾기
           </h2>
@@ -261,7 +262,7 @@ export function HomeContent() {
 
       {/* Results Section */}
       <section className="py-8">
-        <div className="max-w-[1200px] mx-auto px-6">
+        <div className="max-w-[1000px] mx-auto px-6">
           <h2 className="text-xl font-semibold mb-6 text-foreground">
             검색 결과
           </h2>

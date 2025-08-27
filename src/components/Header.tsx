@@ -8,7 +8,7 @@ export function Header() {
   const pathname = usePathname();
   return (
     <header className="bg-white border-b border-border">
-      <div className="max-w-[1200px] mx-auto px-6 py-4">
+      <div className="max-w-[1000px] mx-auto px-6 py-4">
         <div className="flex items-center justify-between relative">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-semibold text-foreground">
@@ -17,9 +17,19 @@ export function Header() {
           </div>
           <nav className="hidden md:flex items-center space-x-6 absolute left-1/2 transform -translate-x-1/2 ">
             <Link
+              href="/"
+              className={`text-base hover:text-foreground py-4.5 transition-colors ${
+                pathname === "/"
+                  ? "text-foreground font-semibold border-b-2 border-primary"
+                  : "text-muted-foreground"
+              }`}
+            >
+              홈
+            </Link>
+            <Link
               href="/herbal-insurance"
               className={`text-base hover:text-foreground py-4.5 transition-colors ${
-                pathname === "/herba-insurance"
+                pathname === "/herbal-insurance"
                   ? "text-foreground font-semibold border-b-2 border-primary"
                   : "text-muted-foreground"
               }`}
@@ -29,7 +39,7 @@ export function Header() {
             <Link
               href="/non-covered"
               className={`text-base hover:text-foreground py-4.5 transition-colors ${
-                pathname === "/non-covered" || pathname === "/"
+                pathname === "/non-covered"
                   ? "text-foreground font-semibold border-b-2 border-primary"
                   : "text-muted-foreground"
               }`}

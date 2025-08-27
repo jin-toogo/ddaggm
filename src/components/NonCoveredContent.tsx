@@ -227,7 +227,7 @@ export function NonCoveredContent() {
     <main className="flex-1">
       {/* Hero Section */}
       <section className="bg-white py-12 md:py-16">
-        <div className="max-w-[1200px] mx-auto px-6">
+        <div className="max-w-[1000px] mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-medium text-foreground mb-4">
               한의원 비급여 진료 가격을 확인해보세요
@@ -241,7 +241,7 @@ export function NonCoveredContent() {
 
       {/* Treatment Filters Section */}
       <section className="bg-white">
-        <div className="max-w-[1200px] mx-auto">
+        <div className="max-w-[1000px] mx-auto">
           <TreatmentFilters
             categories={treatmentCategories}
             selectedTreatment={selectedTreatment}
@@ -257,7 +257,7 @@ export function NonCoveredContent() {
 
       {/* Results Section */}
       <section className="py-8">
-        <div className="max-w-[1200px] mx-auto px-6">
+        <div className="max-w-[1000px] mx-auto px-6">
           <NonCoveredList
             items={nonCoveredItems}
             isLoading={isLoading}

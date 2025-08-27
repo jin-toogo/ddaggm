@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,20 +8,20 @@ export async function GET(request: NextRequest) {
       select: {
         category: true,
       },
-      distinct: ['category'],
+      distinct: ["category"],
       where: {
         category: {
           not: null,
         },
       },
       orderBy: {
-        category: 'asc',
+        category: "asc",
       },
     });
 
     // null이 아닌 category만 필터링하고 문자열 배열로 변환
     const categoryList = categories
-      .map(item => item.category)
+      .map((item) => item.category)
       .filter((category): category is string => category !== null)
       .sort();
 

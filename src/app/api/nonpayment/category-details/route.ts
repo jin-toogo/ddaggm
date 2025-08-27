@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,25 +34,28 @@ export async function GET(request: NextRequest) {
     });
 
     // 정확히 해당 카테고리를 포함하는 항목들만 필터링
-    const exactMatches = matchingItems.filter(item => {
+    const exactMatches = matchingItems.filter((item) => {
       if (!item.category) return false;
       const splitCategories = item.category
-        .split('/')
-        .map(cat => cat.trim())
-        .filter(cat => cat.length > 0);
+        .split("/")
+        .map((cat) => cat.trim())
+        .filter((cat) => cat.length > 0);
       return splitCategories.includes(targetCategory);
     });
 
     // 원본 카테고리별로 그룹화
-    const originalCategoryStats = new Map<string, {
-      count: number;
-      treatments: Set<string>;
-      amounts: number[];
-    }>();
+    const originalCategoryStats = new Map<
+      string,
+      {
+        count: number;
+        treatments: Set<string>;
+        amounts: number[];
+      }
+    >();
 
-    exactMatches.forEach(item => {
+    exactMatches.forEach((item) => {
       if (!item.category) return;
-      
+
       if (!originalCategoryStats.has(item.category)) {
         originalCategoryStats.set(item.category, {
           count: 0,
@@ -75,9 +78,10 @@ export async function GET(request: NextRequest) {
     const categoryDetails = Array.from(originalCategoryStats.entries())
       .map(([category, stats]) => {
         const amounts = stats.amounts;
-        const avgAmount = amounts.length > 0 
-          ? amounts.reduce((sum, amt) => sum + amt, 0) / amounts.length 
-          : null;
+        const avgAmount =
+          amounts.length > 0
+            ? amounts.reduce((sum, amt) => sum + amt, 0) / amounts.length
+            : null;
 
         return {
           originalCategory: category,
@@ -94,11 +98,17 @@ export async function GET(request: NextRequest) {
 
     // 전체 통계
     const totalItems = exactMatches.length;
-    const uniqueTreatments = new Set(exactMatches.map(item => item.treatmentName).filter(Boolean));
-    const allAmounts = exactMatches.map(item => item.amount).filter(Boolean).map(Number);
-    const overallAverage = allAmounts.length > 0 
-      ? allAmounts.reduce((sum, amt) => sum + amt, 0) / allAmounts.length 
-      : null;
+    const uniqueTreatments = new Set(
+      exactMatches.map((item) => item.treatmentName).filter(Boolean)
+    );
+    const allAmounts = exactMatches
+      .map((item) => item.amount)
+      .filter(Boolean)
+      .map(Number);
+    const overallAverage =
+      allAmounts.length > 0
+        ? allAmounts.reduce((sum, amt) => sum + amt, 0) / allAmounts.length
+        : null;
 
     return NextResponse.json({
       searchCategory: targetCategory,

@@ -318,6 +318,21 @@ export default async function HospitalDetail({
                   </span>
                 </div>
               )}
+
+              {hospital.website && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">홈페이지</span>
+                  <span className="text-gray-900">
+                    <a
+                      href={hospital.website}
+                      target="_blank"
+                      className="text-blue-600 hover:underline"
+                    >
+                      홈페이지 방문
+                    </a>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         )}

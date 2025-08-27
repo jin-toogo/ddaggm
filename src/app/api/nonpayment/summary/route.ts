@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
     // category별 treatmentName 개수와 평균 금액
     const categoryStats = await prisma.hospitalNonPaymentItem.groupBy({
-      by: ['category'],
+      by: ["category"],
       _count: {
         treatmentName: true,
       },
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: {
         _count: {
-          treatmentName: 'desc',
+          treatmentName: "desc",
         },
       },
     });
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     // 고유한 category 개수
     const uniqueCategories = await prisma.hospitalNonPaymentItem.findMany({
       select: { category: true },
-      distinct: ['category'],
+      distinct: ["category"],
       where: {
         category: {
           not: null,
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     // 고유한 treatmentName 개수
     const uniqueTreatments = await prisma.hospitalNonPaymentItem.findMany({
       select: { treatmentName: true },
-      distinct: ['treatmentName'],
+      distinct: ["treatmentName"],
       where: {
         treatmentName: {
           not: null,
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
         uniqueTreatments: uniqueTreatments.length,
         averageAmount: totalStats._avg.amount,
       },
-      categoryBreakdown: categoryStats.map(stat => ({
+      categoryBreakdown: categoryStats.map((stat) => ({
         category: stat.category,
         treatmentCount: stat._count.treatmentName,
         averageAmount: stat._avg.amount,

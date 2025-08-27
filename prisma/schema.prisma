@@ -9,27 +9,30 @@ datasource db {
 }
 
 model Hospital {
-  id              Int                      @id @default(autoincrement())
-  encryptedCode   String                   @unique @map("encrypted_code") @db.VarChar(255)
-  name            String                   @map("name") @db.VarChar(255)
-  type            String                   @map("type") @db.VarChar(100)
-  province        String                   @map("province") @db.VarChar(50)
-  district        String                   @map("district") @db.VarChar(50)
-  dong            String?                  @map("dong") @db.VarChar(50)
-  postalCode      String?                  @map("postal_code") @db.VarChar(10)
-  address         String                   @map("address") @db.Text
-  latitude        Decimal?                 @map("latitude") @db.Decimal(10, 8)
-  longitude       Decimal?                 @map("longitude") @db.Decimal(11, 8)
-  phone           String?                  @map("phone") @db.VarChar(20)
-  website         String?                  @map("website") @db.VarChar(255)
-  establishedDate String?                  @map("established_date") @db.VarChar(20)
-  totalDoctors    Int?                     @map("total_doctors")
-  insurance       Boolean                  @default(false) @map("insurance")
-  createdAt       DateTime                 @default(now()) @map("created_at")
-  updatedAt       DateTime                 @updatedAt @map("updated_at")
-  locationDetails HospitalLocationDetail?
-  nonPaymentItems HospitalNonPaymentItem[]
-  operatingHours  HospitalOperatingHour?
+  id               Int                      @id @default(autoincrement())
+  encryptedCode    String                   @unique @map("encrypted_code") @db.VarChar(255)
+  name             String                   @map("name") @db.VarChar(255)
+  type             String                   @map("type") @db.VarChar(100)
+  province         String                   @map("province") @db.VarChar(50)
+  district         String                   @map("district") @db.VarChar(50)
+  dong             String?                  @map("dong") @db.VarChar(50)
+  postalCode       String?                  @map("postal_code") @db.VarChar(10)
+  address          String                   @map("address") @db.Text
+  latitude         Decimal?                 @map("latitude") @db.Decimal(10, 8)
+  longitude        Decimal?                 @map("longitude") @db.Decimal(11, 8)
+  phone            String?                  @map("phone") @db.VarChar(20)
+  website          String?                  @map("website") @db.Text
+  establishedDate  String?                  @map("established_date") @db.VarChar(20)
+  totalDoctors     Int?                     @map("total_doctors")
+  insurance        Boolean                  @default(false) @map("insurance")
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
+  categoryCount    Int                      @default(0) @map("category_count")
+  mainCategories   String?                  @map("main_categories") @db.LongText
+  clinicCategories ClinicCategory[]
+  locationDetails  HospitalLocationDetail?
+  nonPaymentItems  HospitalNonPaymentItem[]
+  operatingHours   HospitalOperatingHour?
 
   @@index([name])
   @@index([province, district])
@@ -104,4 +107,39 @@ model HospitalNonPaymentItem {
   @@index([category])
   @@index([amount])
   @@map("hospital_non_payment_items")
+}
+
+model Category {
+  id               Int              @id @default(autoincrement())
+  name             String           @map("name") @db.VarChar(50)
+  slug             String           @unique @map("slug") @db.VarChar(50)
+  description      String?          @map("description") @db.Text
+  displayOrder     Int              @default(0) @map("display_order")
+  isActive         Boolean          @default(true) @map("is_active")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  icon             String           @map("icon") @db.Text
+  clinicCategories ClinicCategory[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("categories")
+}
+
+model ClinicCategory {
+  id         Int      @id @default(autoincrement())
+  clinicId   Int      @map("clinic_id")
+  categoryId Int      @map("category_id")
+  assignedBy Int?     @map("assigned_by")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  notes      String?  @map("notes") @db.Text
+  isActive   Boolean  @default(true) @map("is_active")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  hospital   Hospital @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@unique([clinicId, categoryId], name: "unique_clinic_category")
+  @@index([clinicId])
+  @@index([categoryId])
+  @@index([isActive])
+  @@map("clinic_categories")
 }

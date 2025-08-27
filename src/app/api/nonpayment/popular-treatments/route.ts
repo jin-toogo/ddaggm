@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     // treatmentName별로 그룹화해서 개수 세기
     const popularTreatments = await prisma.hospitalNonPaymentItem.groupBy({
-      by: ['treatmentName', 'category'],
+      by: ["treatmentName", "category"],
       _count: {
         id: true,
       },
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       where,
       orderBy: {
         _count: {
-          id: 'desc',
+          id: "desc",
         },
       },
       take: limit,
