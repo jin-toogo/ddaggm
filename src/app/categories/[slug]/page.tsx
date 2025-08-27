@@ -14,7 +14,7 @@ import {
 import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 interface Category {
   id: number;
@@ -133,7 +133,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [slug, setSlug] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-
+  const router = useRouter();
   useEffect(() => {
     const initializeParams = async () => {
       const resolvedParams = await params;
@@ -230,7 +230,7 @@ export default function CategoryPage({ params, searchParams }: PageProps) {
                 onClick={() => {
                   router.push(`/hospital/${clinic.id}`);
                 }}
-                className="block w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                className="cursor-pointer block w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center">

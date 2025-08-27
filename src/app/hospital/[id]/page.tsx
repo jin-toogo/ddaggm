@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ArrowLeft, Phone, Clock, MapPin, Car, Info } from "lucide-react";
+import { Phone, Clock, MapPin, Car, Info } from "lucide-react";
 import Link from "next/link";
 import { Metadata } from "next";
 import NonPaymentItems from "@/components/NonPaymentItems";
