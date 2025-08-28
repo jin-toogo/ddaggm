@@ -6,6 +6,7 @@ import NonPaymentItems from "@/components/NonPaymentItems";
 import BackButton from "@/components/BackButton";
 import { StructuredData } from "@/components/StructuredData";
 import { HospitalData } from "@/types";
+import { Button } from "@/components/ui/button";
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {
   try {
@@ -112,6 +113,15 @@ export default async function HospitalDetail({
     notFound();
   }
 
+  const handleNaverMaps = () => {
+    const searchQuery = encodeURIComponent(
+      `${hospital.name} ${hospital.district}`
+    );
+    window.open(
+      `https://map.naver.com/v5/search/${hospital.name} ${hospital.district}`,
+      "_blank"
+    );
+  };
   const operatingHours = [
     {
       day: "월요일",
@@ -151,19 +161,14 @@ export default async function HospitalDetail({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <StructuredData type="hospital" data={hospital} />
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <BackButton />
-            <h1 className="text-lg font-semibold text-gray-900">병원 정보</h1>
-          </div>
-        </div>
+      {/* Back Button */}
+      <div className="mb-6 flex items-center gap-4">
+        <BackButton />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <div className="space-y-6">
         {/* Hospital Name and Basic Info */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex justify-between items-start mb-4">
@@ -348,7 +353,7 @@ export default async function HospitalDetail({
               </p>
             </div>
             <Link
-              href={`https://map.naver.com/p/${hospital.latitude},${hospital.longitude}`}
+              href={`https://map.naver.com/v5/search/${hospital.name} ${hospital.district}`}
               target="_blank"
               className="flex items-center gap-2 px-3 py-2 text-sm  text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors"
             >
@@ -358,9 +363,9 @@ export default async function HospitalDetail({
           </div>
           <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
             <Link
-              href={`https://map.naver.com/p/${hospital.latitude},${hospital.longitude}`}
-              className="w-full h-full"
+              href={`https://map.naver.com/v5/search/${hospital.name} ${hospital.district}`}
               target="_blank"
+              className="w-full h-full"
             >
               <img
                 src={`https://maps.apigw.ntruss.com/map-static/v2/raster-cors?w=800&h=500&markers=type:d|size:mid|pos:${hospital.longitude}%20${hospital.latitude}&center=${hospital.longitude},${hospital.latitude}&level=16&scale=2&X-NCP-APIGW-API-KEY-ID=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}&X-NCP-APIGW-API-KEY=${process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET}`}

@@ -5,20 +5,18 @@ import Link from "next/link";
 import { ClinicListItemProps } from "@/types";
 
 export function ClinicListItem({ clinic }: ClinicListItemProps) {
-  const handleNaverSearch = () => {
-    const searchQuery = encodeURIComponent(
-      `${clinic.name} ${clinic.district_kor}`
-    );
+  const handleNaverSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const searchQuery = encodeURIComponent(`${clinic.name} ${clinic.district}`);
     window.open(
       `https://search.naver.com/search.naver?query=${searchQuery}`,
       "_blank"
     );
   };
 
-  const handleNaverMaps = () => {
-    const searchQuery = encodeURIComponent(
-      `${clinic.name} ${clinic.district_kor}`
-    );
+  const handleNaverMaps = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const searchQuery = encodeURIComponent(`${clinic.name} ${clinic.district}`);
     window.open(`https://map.naver.com/v5/search/${searchQuery}`, "_blank");
   };
 

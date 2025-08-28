@@ -43,6 +43,9 @@ export async function GET(request: NextRequest) {
         },
       };
     }
+    const orderBy: any = {
+      updatedAt: "desc",
+    };
 
     // 총 개수 조회
     const totalCount = await prisma.hospital.count({ where });
@@ -63,9 +66,7 @@ export async function GET(request: NextRequest) {
       },
       skip,
       take: limit,
-      orderBy: {
-        name: "asc",
-      },
+      orderBy,
     });
 
     // Clinic 인터페이스에 맞게 데이터 변환

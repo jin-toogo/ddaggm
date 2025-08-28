@@ -229,4 +229,5 @@
 
 html {
   font-size: var(--font-size);
+  background-color: oklch(98.5% 0.002 247.839);
 }

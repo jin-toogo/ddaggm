@@ -1,7 +1,5 @@
 import React, { Suspense } from "react";
 import { Metadata } from "next";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { NonCoveredContent } from "@/components/NonCoveredContent";
 import { StructuredData } from "@/components/StructuredData";
 
@@ -38,24 +36,22 @@ export const metadata: Metadata = {
 
 export default function NonCoveredPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div>
       <StructuredData type="non-payment" />
-      <Header />
       <Suspense
         fallback={
-          <main className="flex-1 flex items-center justify-center">
+          <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-muted-foreground">
                 비급여 데이터를 불러오는 중...
               </p>
             </div>
-          </main>
+          </div>
         }
       >
         <NonCoveredContent />
       </Suspense>
-      <Footer />
     </div>
   );
 }

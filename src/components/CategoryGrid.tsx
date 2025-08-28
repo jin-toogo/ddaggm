@@ -90,13 +90,13 @@ export default function CategoryGrid() {
   }
 
   return (
-    <section className="max-w-[1000px] mx-auto w-full py-12 px-6">
+    <section className="max-w-[1000px] mx-auto w-full pb-12">
       <div className="">
         <h2 className="text-2xl font-bold text-gray-900 mb-8">
           관심있는 항목을 선택해보세요.
         </h2>
 
-        <div className="grid grid-cols-2 gap-12">
+        <div className="grid grid-cols-2 gap-6">
           {allCategories.map((category, index) => {
             return (
               <Link
@@ -106,14 +106,16 @@ export default function CategoryGrid() {
                     ? `/categories/${category.slug}`
                     : "#"
                 }
-                className={`flex flex-col items-center space-y-2 group transition-all duration-200 ${
+                className={`w-full flex justify-center group transition-all duration-200  ${
                   category.clinicCount > 0 ? "cursor-pointer" : "cursor-default"
                 }`}
               >
-                <category.Icon className="w-10 h-10 text-gray-700" />
-                <span className="text-sm text-black text-center">
-                  {category.displayName}
-                </span>
+                <div className="w-fit flex flex-col items-center space-y-2 transition-all bg-gray-100/0 group-hover:bg-gray-100/100 rounded-md px-6 py-4">
+                  <category.Icon className="w-10 h-10 text-gray-700  transition-all" />
+                  <span className="text-sm text-black text-center  group-hover:font-bold transition-all">
+                    {category.displayName}
+                  </span>
+                </div>
               </Link>
             );
           })}

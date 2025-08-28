@@ -11,9 +11,11 @@ export function Header() {
       <div className="max-w-[1000px] mx-auto px-6 py-4">
         <div className="flex items-center justify-between relative">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-semibold text-foreground">
-              DDaggm&nbsp;따끔
-            </h1>
+            <Link href="/" className="cursor-pointer">
+              <h1 className="text-xl font-semibold text-foreground">
+                DDaggm&nbsp;따끔
+              </h1>
+            </Link>
           </div>
           <nav className="hidden md:flex items-center space-x-6 absolute left-1/2 transform -translate-x-1/2 ">
             <Link

@@ -85,13 +85,13 @@ export function filterClinics(
 
   // 도시로 필터링
   if (selectedCity && selectedCity !== "all") {
-    filtered = filtered.filter((clinic) => clinic.city_kor === selectedCity);
+    filtered = filtered.filter((clinic) => clinic.province === selectedCity);
   }
 
   // 구/군으로 필터링
   if (selectedDistrict && selectedDistrict !== "all") {
     filtered = filtered.filter(
-      (clinic) => clinic.district_kor === selectedDistrict
+      (clinic) => clinic.district === selectedDistrict
     );
   }
 
@@ -100,7 +100,7 @@ export function filterClinics(
 
 // 도시 목록을 가져오는 함수
 export function getCities(clinics: Clinic[]): string[] {
-  const cities = new Set(clinics.map((clinic) => clinic.city_kor));
+  const cities = new Set(clinics.map((clinic) => clinic.province));
   return Array.from(cities).sort();
 }
 
@@ -113,8 +113,8 @@ export function getDistricts(
 
   const districts = new Set(
     clinics
-      .filter((clinic) => clinic.city_kor === selectedCity)
-      .map((clinic) => clinic.district_kor)
+      .filter((clinic) => clinic.province === selectedCity)
+      .map((clinic) => clinic.district)
   );
   return Array.from(districts).sort();
 }
