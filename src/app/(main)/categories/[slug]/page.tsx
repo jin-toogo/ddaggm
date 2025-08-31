@@ -13,9 +13,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import React from "react";
-
+import { useRouter } from "next/navigation";
 interface Category {
   id: number;
   name: string;
@@ -87,6 +86,7 @@ export default function CategoryPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const router = useRouter();
   const resolvedParams = React.use(params);
   const [category, setCategory] = useState<Category | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
@@ -103,7 +103,6 @@ export default function CategoryPage({
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      console.log("resolvedParams :>> ", resolvedParams);
       // Get category data
       const categoryData = await getCategory(resolvedParams.slug);
       if (!resolvedParams.slug) {
@@ -113,14 +112,12 @@ export default function CategoryPage({
       }
 
       setCategory(categoryData);
-      console.log("categoryData :>> ", categoryData);
       // Get clinics for category
       const clinicsData = await getClinicsForCategory(
         resolvedParams.slug,
         1,
         10
       );
-      console.log("clinicsData :>> ", clinicsData);
       setClinics(clinicsData.clinics);
       setPagination(clinicsData.pagination);
 
@@ -219,22 +216,24 @@ export default function CategoryPage({
             {/* Clinic Cards */}
             <div className="grid gap-6">
               {clinics.map((clinic) => (
-                <div
+                <button
                   key={clinic.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                  onClick={() => {
+                    router.push(`/hospital/${clinic.id}`);
+                  }}
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         {clinic.name}
                       </h3>
-                      <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <Badge variant="secondary">{clinic.type}</Badge>
-                        {clinic.insurance && (
+                      <div className="flex flex-wrap items-center ">
+                        {clinic.insurance ? (
                           <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
                             보험 적용
                           </Badge>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -271,21 +270,7 @@ export default function CategoryPage({
                       </div>
                     )}
                   </div>
-
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-500">
-                        {clinic.province} {clinic.district}
-                      </div>
-                      <Link
-                        href={`/hospital/${clinic.id}`}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      >
-                        상세보기 →
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+                </button>
               ))}
             </div>
 

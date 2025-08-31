@@ -40,7 +40,7 @@ export function Sidebar({ onClose }: SidebarProps) {
   return (
     <div className="h-full flex flex-col">
       {/* 브랜드 */}
-      <div className="p-6 ">
+      <div className="p-6 fixed top-2 left-2">
         <Link href="/" className="cursor-pointer">
           <h1 className="text-xl font-semibold text-gray-900 hover:font-bold transition-all">
             DDaggm&nbsp;따끔

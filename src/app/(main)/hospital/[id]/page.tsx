@@ -7,6 +7,7 @@ import BackButton from "@/components/BackButton";
 import { StructuredData } from "@/components/StructuredData";
 import { HospitalData } from "@/types";
 import { Button } from "@/components/ui/button";
+import { HospitalBlogSection } from "@/components/HospitalBlogSection";
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {
   try {
@@ -113,15 +114,6 @@ export default async function HospitalDetail({
     notFound();
   }
 
-  const handleNaverMaps = () => {
-    const searchQuery = encodeURIComponent(
-      `${hospital.name} ${hospital.district}`
-    );
-    window.open(
-      `https://map.naver.com/v5/search/${hospital.name} ${hospital.district}`,
-      "_blank"
-    );
-  };
   const operatingHours = [
     {
       day: "월요일",
@@ -338,9 +330,34 @@ export default async function HospitalDetail({
                   </span>
                 </div>
               )}
+
+              {hospital.naverBlogUrl && (
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">네이버 블로그</span>
+                  <span className="text-gray-900">
+                    <a
+                      href={hospital.naverBlogUrl}
+                      target="_blank"
+                      className="flex items-center gap-2 text-green-600 hover:underline"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.004 5.367 18.637.001 12.017.001zM8.232 15.768c-1.161 0-2.103-.943-2.103-2.104s.942-2.104 2.103-2.104c1.162 0 2.104.943 2.104 2.104s-.943 2.104-2.104 2.104zm3.785 0c-1.161 0-2.104-.943-2.104-2.104s.943-2.104 2.104-2.104c1.161 0 2.103.943 2.103 2.104s-.942 2.104-2.103 2.104zm3.785 0c-1.162 0-2.104-.943-2.104-2.104s.942-2.104 2.104-2.104c1.161 0 2.103.943 2.103 2.104s-.942 2.104-2.103 2.104z" />
+                      </svg>
+                      블로그 방문
+                    </a>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         )}
+
+        {/* Blog Section */}
+        <HospitalBlogSection hospitalId={parseInt(id)} />
 
         {/* Map Section */}
         <div className="bg-white rounded-lg shadow-sm p-6">

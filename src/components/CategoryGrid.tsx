@@ -53,7 +53,6 @@ export default function CategoryGrid() {
     try {
       const response = await fetch("/api/categories/");
       const data = await response.json();
-      console.log("data :>> ", data);
       setCategories(data.categories);
     } catch (error) {
       console.error("Failed to fetch categories:", error);

@@ -22,6 +22,7 @@ model Hospital {
   longitude        Decimal?                 @map("longitude") @db.Decimal(11, 8)
   phone            String?                  @map("phone") @db.VarChar(20)
   website          String?                  @map("website") @db.Text
+  naverBlogUrl     String?                  @map("naver_blog_url") @db.VarChar(500)
   establishedDate  String?                  @map("established_date") @db.VarChar(20)
   totalDoctors     Int?                     @map("total_doctors")
   insurance        Boolean                  @default(false) @map("insurance")

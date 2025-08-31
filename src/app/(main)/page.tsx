@@ -25,7 +25,6 @@ export default function HomePage() {
         );
         if (nonCoveredResponse.ok) {
           const nonCoveredData = await nonCoveredResponse.json();
-          console.log("nonCoveredData :>> ", nonCoveredData);
           setNonCoveredItems(nonCoveredData.data || []);
         }
 
@@ -38,7 +37,6 @@ export default function HomePage() {
           1,
           5
         );
-        console.log("herbalData :>> ", herbalData);
         if (herbalData && herbalData.clinics) {
           setHerbalClinics(herbalData.clinics);
         }

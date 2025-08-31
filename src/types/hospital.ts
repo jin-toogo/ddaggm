@@ -12,6 +12,7 @@ export interface HospitalData {
   longitude: number | null;
   phone: string | null;
   website: string | null;
+  naverBlogUrl: string | null;
   establishedDate: string | null;
   totalDoctors: number | null;
   insurance: boolean;
