@@ -194,7 +194,9 @@ export default async function HospitalDetail({
         </div>
 
         {/* Non-Payment Items */}
-        <NonPaymentItems items={hospital.nonPaymentItems || []} />
+        {hospital.nonPaymentItems && hospital.nonPaymentItems.length > 0 && (
+          <NonPaymentItems items={hospital.nonPaymentItems} />
+        )}
 
         {/* Operating Hours */}
         <div className="bg-white rounded-lg shadow-sm p-6">
@@ -340,13 +342,6 @@ export default async function HospitalDetail({
                       target="_blank"
                       className="flex items-center gap-2 text-green-600 hover:underline"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.004 5.367 18.637.001 12.017.001zM8.232 15.768c-1.161 0-2.103-.943-2.103-2.104s.942-2.104 2.103-2.104c1.162 0 2.104.943 2.104 2.104s-.943 2.104-2.104 2.104zm3.785 0c-1.161 0-2.104-.943-2.104-2.104s.943-2.104 2.104-2.104c1.161 0 2.103.943 2.103 2.104s-.942 2.104-2.103 2.104zm3.785 0c-1.162 0-2.104-.943-2.104-2.104s.942-2.104 2.104-2.104c1.161 0 2.103.943 2.103 2.104s-.942 2.104-2.103 2.104z" />
-                      </svg>
                       블로그 방문
                     </a>
                   </span>

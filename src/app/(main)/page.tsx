@@ -52,7 +52,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="p-6">
+    <div className="">
       <StructuredData type="non-payment" />
 
       {/* Category Grid Section */}
@@ -65,7 +65,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               인기 비급여 진료 항목
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 max-sm:hidden">
               많은 분들이 찾는 한의원 비급여 진료를 확인해보세요
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               한방 첩약 보험 적용 한의원
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 max-sm:hidden">
               실손보험으로 첩약 치료를 받을 수 있는 한의원을 찾아보세요
             </p>
           </div>
