@@ -26,9 +26,11 @@ export class BlogService {
       const response = await fetch(rssUrl, {
         next: { revalidate: 10800 }, // 3시간 캐싱
       });
-      
+
       if (!response.ok) {
-        console.error(`RSS fetch failed: ${response.status} ${response.statusText}`);
+        console.error(
+          `RSS fetch failed: ${response.status} ${response.statusText}`
+        );
         return [];
       }
 
@@ -39,14 +41,19 @@ export class BlogService {
       const items = result.rss?.channel?.[0]?.item || [];
       return items.slice(0, 5).map((item: any) => {
         const description = item.description?.[0] || "";
-        const tags = item.tag?.[0] ? item.tag[0].split(',').map((tag: string) => tag.trim()) : [];
-        
+        const tags = item.tag?.[0]
+          ? item.tag[0].split(",").map((tag: string) => tag.trim())
+          : [];
+
         // description에서 이미지 URL 추출
-        const imageMatches = description.match(/<img[^>]*src="([^"]*)"[^>]*>/g) || [];
-        const images = imageMatches.map((match: string) => {
-          const srcMatch = match.match(/src="([^"]*)"/);
-          return srcMatch ? srcMatch[1] : "";
-        }).filter(Boolean);
+        const imageMatches =
+          description.match(/<img[^>]*src="([^"]*)"[^>]*>/g) || [];
+        const images = imageMatches
+          .map((match: string) => {
+            const srcMatch = match.match(/src="([^"]*)"/);
+            return srcMatch ? srcMatch[1] : "";
+          })
+          .filter(Boolean);
 
         return {
           title: item.title?.[0] || "",
@@ -65,44 +72,44 @@ export class BlogService {
     }
   }
 
-  // 병원 블로그 피드 생성/업데이트
-  static async createBlogFeed(hospitalId: number, websiteUrl: string) {
-    const rssUrl = this.generateRssUrl(websiteUrl);
-    if (!rssUrl) throw new Error("Invalid Naver blog URL");
+  // // 병원 블로그 피드 생성/업데이트
+  // static async createBlogFeed(hospitalId: number, websiteUrl: string) {
+  //   const rssUrl = this.generateRssUrl(websiteUrl);
+  //   if (!rssUrl) throw new Error("Invalid Naver blog URL");
 
-    return await prisma.blogFeed.upsert({
-      where: { hospitalId },
-      update: { rssUrl },
-      create: { hospitalId, rssUrl },
-    });
-  }
+  //   return await prisma.blogFeed.upsert({
+  //     where: { hospitalId },
+  //     update: { rssUrl },
+  //     create: { hospitalId, rssUrl },
+  //   });
+  // }
 
-  // 병원의 블로그 포스트 가져오기
-  static async getHospitalBlogPosts(hospitalId: number): Promise<BlogPost[]> {
-    const blogFeed = await prisma.blogFeed.findUnique({
-      where: { hospitalId, isActive: true },
-    });
+  // // 병원의 블로그 포스트 가져오기
+  // static async getHospitalBlogPosts(hospitalId: number): Promise<BlogPost[]> {
+  //   const blogFeed = await prisma.blogFeed.findUnique({
+  //     where: { hospitalId, isActive: true },
+  //   });
 
-    if (!blogFeed) return [];
-    return await this.fetchBlogPosts(blogFeed.rssUrl);
-  }
+  //   if (!blogFeed) return [];
+  //   return await this.fetchBlogPosts(blogFeed.rssUrl);
+  // }
 
-  // 네이버 블로그 URL인지 확인
-  static isNaverBlog(url: string): boolean {
-    const naverBlogPatterns = [
-      /blog\.naver\.com\/([^\/]+)/,
-      /m\.blog\.naver\.com\/([^\/]+)/,
-      /.*\.blog\.me/,
-    ];
-    return naverBlogPatterns.some((pattern) => pattern.test(url));
-  }
+  // // 네이버 블로그 URL인지 확인
+  // static isNaverBlog(url: string): boolean {
+  //   const naverBlogPatterns = [
+  //     /blog\.naver\.com\/([^\/]+)/,
+  //     /m\.blog\.naver\.com\/([^\/]+)/,
+  //     /.*\.blog\.me/,
+  //   ];
+  //   return naverBlogPatterns.some((pattern) => pattern.test(url));
+  // }
 
   // 병원의 웹사이트가 네이버 블로그인지 확인하고 피드 생성
-  static async setupHospitalBlogFeed(hospitalId: number, websiteUrl: string) {
-    if (!this.isNaverBlog(websiteUrl)) {
-      throw new Error("Not a Naver blog URL");
-    }
+  // static async setupHospitalBlogFeed(hospitalId: number, websiteUrl: string) {
+  //   if (!this.isNaverBlog(websiteUrl)) {
+  //     throw new Error("Not a Naver blog URL");
+  //   }
 
-    return await this.createBlogFeed(hospitalId, websiteUrl);
-  }
+  //   return await this.createBlogFeed(hospitalId, websiteUrl);
+  // }
 }
