@@ -193,6 +193,9 @@ export default async function HospitalDetail({
           </div>
         </div>
 
+        {/* Blog Section */}
+        <HospitalBlogSection hospitalId={parseInt(id)} />
+
         {/* Non-Payment Items */}
         {hospital.nonPaymentItems && hospital.nonPaymentItems.length > 0 && (
           <NonPaymentItems items={hospital.nonPaymentItems} />
@@ -292,7 +295,7 @@ export default async function HospitalDetail({
         )}
 
         {/* Additional Info */}
-        {(hospital.locationDetails?.landmark || hospital.totalDoctors) && (
+        {hospital.locationDetails?.landmark || hospital.totalDoctors ? (
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center gap-2 mb-4">
               <Info className="w-5 h-5 text-gray-700" />
@@ -349,10 +352,7 @@ export default async function HospitalDetail({
               )}
             </div>
           </div>
-        )}
-
-        {/* Blog Section */}
-        <HospitalBlogSection hospitalId={parseInt(id)} />
+        ) : null}
 
         {/* Map Section */}
         <div className="bg-white rounded-lg shadow-sm p-6">
