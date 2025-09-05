@@ -34,6 +34,7 @@ model Hospital {
   locationDetails  HospitalLocationDetail?
   nonPaymentItems  HospitalNonPaymentItem[]
   operatingHours   HospitalOperatingHour?
+  blogPosts        BlogPost[]
 
   @@index([name])
   @@index([province, district])
@@ -143,4 +144,40 @@ model ClinicCategory {
   @@index([categoryId])
   @@index([isActive])
   @@map("clinic_categories")
+}
+
+model BlogPost {
+  id           String   @id @default(cuid())
+  title        String   @map("title") @db.VarChar(500)
+  content      String   @map("content") @db.Text
+  summary      String?  @map("summary") @db.VarChar(500)
+  imageUrl     String?  @map("image_url") @db.Text
+  originalUrl  String   @unique @map("original_url") @db.VarChar(1000)
+  publishedAt  DateTime @map("published_at")
+  author       String   @map("author") @db.VarChar(100)
+
+  // CSV 입력 정보
+  clinicName    String? @map("clinic_name") @db.VarChar(255)
+  clinicAddress String? @map("clinic_address") @db.Text
+  hospitalId    Int?    @map("hospital_id")
+  notes         String? @map("notes") @db.Text
+
+  // 매칭 상태
+  isMatched Boolean @default(false) @map("is_matched")
+
+  // 메타데이터
+  categories String   @map("categories") @db.Text
+  tags       String   @map("tags") @db.Text
+  isVerified Boolean @default(false) @map("is_verified")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  hospital Hospital? @relation(fields: [hospitalId], references: [id])
+
+  @@index([publishedAt])
+  @@index([clinicName])
+  @@index([isMatched])
+  @@index([hospitalId])
+  @@map("blog_posts")
 }
