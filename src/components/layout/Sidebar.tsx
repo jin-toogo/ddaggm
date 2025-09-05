@@ -3,12 +3,19 @@
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Home, Pill, DollarSign, MessageCircle } from "lucide-react";
+import {
+  Home,
+  Pill,
+  DollarSign,
+  MessageCircle,
+  GanttChart,
+} from "lucide-react";
 
 const menuItems = [
   { href: "/", label: "홈", icon: Home },
   { href: "/herbal-insurance", label: "첩약 보험", icon: Pill },
   { href: "/non-covered", label: "비급여", icon: DollarSign },
+  { href: "/reviews", label: "후기", icon: GanttChart },
   {
     href: "https://forms.gle/ynAUn3fswwchot6s6",
     label: "문의",

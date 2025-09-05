@@ -13,17 +13,74 @@ export interface BlogPost {
 }
 
 export class BlogService {
-  // 네이버 블로그 URL에서 RSS URL 생성
+  // Lambda를 통한 네이버 블로그 개별 포스트 크롤링
+  static async fetchSingleBlogPost(postUrl: string): Promise<BlogPost | null> {
+    try {
+      const lambdaUrl = process.env.LAMBDA_CRAWLER_URL;
+      if (!lambdaUrl) {
+        throw new Error('LAMBDA_CRAWLER_URL environment variable is not set');
+      }
+
+      console.log("Calling Lambda crawler for:", postUrl);
+      
+      const response = await fetch(lambdaUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ blogUrl: postUrl })
+      });
+
+      if (!response.ok) {
+        console.error(`Lambda call failed: ${response.status} ${response.statusText}`);
+        return null;
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        console.error('Lambda extraction failed:', result.error);
+        return null;
+      }
+
+      const blogData = result.data;
+      console.log('Lambda extraction successful:', {
+        title: blogData.title?.substring(0, 50),
+        contentLength: blogData.content?.length || 0,
+        author: blogData.author
+      });
+
+      return {
+        title: blogData.title || '',
+        link: postUrl,
+        pubDate: blogData.pubDate || '',
+        description: blogData.description || blogData.content?.substring(0, 1000) || '',
+        author: blogData.author || '',
+        category: blogData.category || '',
+        tags: blogData.tags || [],
+        images: blogData.images || []
+      };
+    } catch (error) {
+      console.error("Lambda blog crawling error:", error);
+      return null;
+    }
+  }
+
+  // 네이버 블로그 URL에서 RSS URL 생성 (기존 메소드 유지)
   static generateRssUrl(websiteUrl: string): string | null {
     const blogIdMatch = websiteUrl.match(/blog\.naver\.com\/([^\/\?#]+)/);
     if (!blogIdMatch) return null;
     return `https://rss.blog.naver.com/${blogIdMatch[1]}.xml`;
   }
 
-  // RSS 피드에서 최신 포스트들 가져오기 (실시간)
+  // RSS 피드에서 최신 포스트들 가져오기 (기존 메소드 유지)
   static async fetchBlogPosts(rssUrl: string): Promise<BlogPost[]> {
     try {
       const response = await fetch(rssUrl, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        },
         next: { revalidate: 10800 }, // 3시간 캐싱
       });
 
@@ -35,11 +92,11 @@ export class BlogService {
       }
 
       const xmlData = await response.text();
+
       const parser = new xml2js.Parser();
       const result = await parser.parseStringPromise(xmlData);
-
       const items = result.rss?.channel?.[0]?.item || [];
-      return items.slice(0, 5).map((item: any) => {
+      return items.map((item: any) => {
         const description = item.description?.[0] || "";
         const tags = item.tag?.[0]
           ? item.tag[0].split(",").map((tag: string) => tag.trim())
@@ -54,10 +111,9 @@ export class BlogService {
             return srcMatch ? srcMatch[1] : "";
           })
           .filter(Boolean);
-
         return {
           title: item.title?.[0] || "",
-          link: item.link?.[0] || "",
+          link: item.link[0] || "",
           pubDate: item.pubDate?.[0] || "",
           description,
           author: item.author?.[0] || "",
