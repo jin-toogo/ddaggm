@@ -61,30 +61,40 @@ export default function CategoryGrid() {
     }
   };
 
+  // 홈페이지에서 보여줄 주요 4개 카테고리만 필터링
+  const mainCategorySlugs = ['pregnancy', 'diet', 'beauty', 'menopause'];
+  
   const allCategories = [
-    ...categories.map((cat) => ({
-      ...cat,
-      Icon: categoryIcons[cat.slug] || FileText,
-      displayName: categorySimpleNames[cat.slug] || cat.name,
-    })),
+    ...categories
+      .filter(cat => mainCategorySlugs.includes(cat.slug))
+      .map((cat) => ({
+        ...cat,
+        Icon: categoryIcons[cat.slug] || FileText,
+        displayName: categorySimpleNames[cat.slug] || cat.name,
+      })),
   ];
 
   if (loading) {
     return (
-      <div className="max-w-[1000px] mx-auto w-full py-12 px-6 bg-white">
+      <section className="max-w-[1000px] mx-auto w-full pb-12">
         <div className="">
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4">
-            {[...Array(16)].map((_, i) => (
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            관심있는 항목을 선택해보세요.
+          </h2>
+          <div className="grid grid-cols-2 gap-6">
+            {[...Array(4)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
-                  <div className="w-12 h-4 bg-gray-200 rounded"></div>
+                <div className="w-full flex justify-center">
+                  <div className="w-fit flex flex-col items-center space-y-2 bg-gray-100 rounded-md px-6 py-4">
+                    <div className="w-10 h-10 bg-gray-200 rounded"></div>
+                    <div className="w-16 h-4 bg-gray-200 rounded"></div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
     );
   }
 

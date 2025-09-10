@@ -52,8 +52,8 @@ export function MainLayout({ children, pageTitle }: MainLayoutProps) {
         </div>
 
         {/* Thread 원본 스크롤 방식 - 자연스러운 전체 페이지 스크롤 */}
-        <div className="px-4 lg:px-8">
-          <div className="max-w-4xl mx-auto bg-white border-x border-gray-200 shadow-sm p-4 lg:p-6">
+        <div className="px-4 lg:px-8 min-h-[calc(100vh-54px)]">
+          <div className="max-w-4xl mx-auto bg-white border-x border-gray-200 shadow-sm p-4 lg:p-6 min-h-[calc(100vh-54px)]">
             {children}
           </div>
         </div>

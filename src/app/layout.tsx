@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import { SessionProvider } from "@/components/providers/SessionProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -12,7 +14,18 @@ export const metadata: Metadata = {
   title: "한의원 보험 적용 확인 - 한방 첩약 보험 정보",
   description:
     "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다. 한방 첩약 보험 적용 정보를 제공합니다.",
-  keywords: ["한의원", "보험", "한방", "첩약", "건강보험", "한의원 찾기", "비급여", "추나요법", "침술", "한방치료비"],
+  keywords: [
+    "한의원",
+    "보험",
+    "한방",
+    "첩약",
+    "건강보험",
+    "한의원 찾기",
+    "비급여",
+    "추나요법",
+    "침술",
+    "한방치료비",
+  ],
   authors: [{ name: "한의원 보험 확인 시스템" }],
   verification: {
     other: {
@@ -21,7 +34,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "한의원 보험 적용 확인 - 한방 첩약 보험 정보",
-    description: "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다. 비급여 진료비 정보도 함께 제공합니다.",
+    description:
+      "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다. 비급여 진료비 정보도 함께 제공합니다.",
     type: "website",
     locale: "ko_KR",
     url: "https://ddaggm.com",
@@ -50,6 +64,7 @@ export default function RootLayout({
           type="text/javascript"
           src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}`}
         ></Script>
+
         {/* Google Tag Manager */}
         <Script
           id="gtm-script"
@@ -76,8 +91,10 @@ export default function RootLayout({
           />
         </noscript>
         {/* End Google Tag Manager (noscript) */}
-
-        {children}
+        <SessionProvider>
+          {children}
+        </SessionProvider>
+        <Toaster />
       </body>
     </html>
   );
