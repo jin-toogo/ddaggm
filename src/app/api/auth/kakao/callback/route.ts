@@ -203,7 +203,8 @@ export async function GET(request: NextRequest) {
       };
 
       // success 페이지 파라미터 설정
-      const successUrl = new URL("/auth/success", request.url);
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
+      const successUrl = new URL("/auth/success", baseUrl);
       successUrl.searchParams.set("provider", "kakao");
       successUrl.searchParams.set("redirectUrl", "/");
 
@@ -220,7 +221,8 @@ export async function GET(request: NextRequest) {
     }
 
     // 5. 새 사용자 - 임시 세션 생성
-    const response = NextResponse.redirect(new URL("/onboarding/profile", request.url));
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
+    const response = NextResponse.redirect(new URL("/onboarding/profile", baseUrl));
     
     createTemporarySession(response, {
       provider: "kakao",

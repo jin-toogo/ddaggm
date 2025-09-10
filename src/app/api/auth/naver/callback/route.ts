@@ -197,7 +197,8 @@ export async function GET(request: NextRequest) {
       };
 
       // success 페이지 파라미터 설정  
-      const successUrl = new URL("/auth/success", request.url);
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
+      const successUrl = new URL("/auth/success", baseUrl);
       successUrl.searchParams.set("provider", "naver");
       successUrl.searchParams.set("redirectUrl", "/");
 
@@ -214,7 +215,8 @@ export async function GET(request: NextRequest) {
     }
 
     // 새 사용자 - 임시 세션 생성
-    const response = NextResponse.redirect(new URL("/onboarding/profile", request.url));
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
+    const response = NextResponse.redirect(new URL("/onboarding/profile", baseUrl));
     
     createTemporarySession(response, {
       provider: "naver",
@@ -229,10 +231,11 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("네이버 콜백 처리 오류:", error);
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
     return NextResponse.redirect(
       new URL(
         "/auth/error?message=네이버 로그인 처리 중 오류가 발생했습니다",
-        request.url
+        baseUrl
       )
     );
   }
