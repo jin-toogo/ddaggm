@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
     // CORS 헤더 설정
     response.headers.set(
       "Access-Control-Allow-Origin",
-      process.env.NEXTAUTH_URL || "http://localhost:3000"
+      process.env.NEXTAUTH_URL || "https://ddaggm.com"
     );
     response.headers.set(
       "Access-Control-Allow-Methods",
