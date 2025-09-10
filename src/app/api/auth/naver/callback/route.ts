@@ -174,26 +174,15 @@ export async function GET(request: NextRequest) {
     });
 
     if (existingUser) {
-      // 이미 가입된 사용자 - 정상 로그인 처리
+      // 이미 가입된 사용자 - 정상 로그인 처리 (쿠키 크기 최소화)
       const sessionUser = {
         id: existingUser.id.toString(),
         email: existingUser.email,
         nickname: existingUser.nickname,
         profileImage: existingUser.profileImage || undefined,
         provider: existingUser.provider,
-        region: existingUser.region || undefined,
-        ageGroup: existingUser.ageGroup || undefined,
-        gender: (existingUser.gender as "m" | "f" | "u" | undefined) || undefined,
         privacyAgreed: existingUser.privacyAgreed,
-        marketingAgreed: existingUser.marketingAgreed || undefined,
-        interests: existingUser.interests.map((interest) => ({
-          id: interest.id,
-          categoryId: interest.categoryId,
-          category: {
-            ...interest.category,
-            description: interest.category.description || undefined,
-          },
-        })),
+        // interests는 별도 API로 조회하도록 변경 (쿠키 크기 문제 해결)
       };
 
       // success 페이지 파라미터 설정  

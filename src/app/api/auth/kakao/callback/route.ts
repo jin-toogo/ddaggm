@@ -63,7 +63,6 @@ export async function GET(request: NextRequest) {
     const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
 
-
     if (!clientId) {
       console.error("KAKAO_CLIENT_ID가 설정되지 않았습니다.");
       return NextResponse.json(
@@ -158,17 +157,11 @@ export async function GET(request: NextRequest) {
       userData.properties?.nickname ||
       email.split("@")[0] ||
       "사용자";
-    const profileImage =
-      userData.kakao_account?.profile?.profile_image_url ||
-      userData.properties?.profile_image;
 
     // 4. 기존 사용자 확인 (이미 가입된 경우)
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [
-          { provider: "kakao", providerId: kakaoId },
-          { email: email }
-        ]
+        OR: [{ provider: "kakao", providerId: kakaoId }, { email: email }],
       },
       include: {
         interests: {
@@ -180,30 +173,20 @@ export async function GET(request: NextRequest) {
     });
 
     if (existingUser) {
-      // 이미 가입된 사용자 - 정상 로그인 처리
+      // 이미 가입된 사용자 - 정상 로그인 처리 (쿠키 크기 최소화)
       const sessionUser = {
         id: existingUser.id.toString(),
         email: existingUser.email,
         nickname: existingUser.nickname,
-        profileImage: existingUser.profileImage || undefined,
         provider: existingUser.provider,
-        region: existingUser.region || undefined,
-        ageGroup: existingUser.ageGroup || undefined,
-        gender: existingUser.gender as 'm' | 'f' | 'u' | undefined || undefined,
-        privacyAgreed: existingUser.privacyAgreed,
-        marketingAgreed: existingUser.marketingAgreed || undefined,
-        interests: existingUser.interests.map((interest) => ({
-          id: interest.id,
-          categoryId: interest.categoryId,
-          category: {
-            ...interest.category,
-            description: interest.category.description || undefined,
-          },
-        })),
+        // interests는 별도 API로 조회하도록 변경 (쿠키 크기 문제 해결)
       };
 
       // success 페이지 파라미터 설정
-      const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
+      const baseUrl =
+        process.env.NEXTAUTH_URL ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        request.url;
       const successUrl = new URL("/auth/success", baseUrl);
       successUrl.searchParams.set("provider", "kakao");
       successUrl.searchParams.set("redirectUrl", "/");
@@ -221,17 +204,20 @@ export async function GET(request: NextRequest) {
     }
 
     // 5. 새 사용자 - 임시 세션 생성
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
-    const response = NextResponse.redirect(new URL("/onboarding/profile", baseUrl));
-    
+    const baseUrl =
+      process.env.NEXTAUTH_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      request.url;
+    const response = NextResponse.redirect(
+      new URL("/onboarding/profile", baseUrl)
+    );
+
     createTemporarySession(response, {
       provider: "kakao",
       providerId: kakaoId,
       email,
       nickname,
-      profileImage,
     });
-
 
     return response;
   } catch (error) {
