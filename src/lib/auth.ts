@@ -40,20 +40,6 @@ export function signToken(user: User): string {
   return jwt.sign(user, JWT_SECRET, { expiresIn: "7d" });
 }
 
-export function verifyToken(token: string): SessionData | null {
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as SessionData;
-
-    return decoded;
-  } catch (error) {
-    console.error("JWT verification failed:", {
-      error: error instanceof Error ? error.message : error,
-      tokenPreview: token.substring(0, 50) + "...",
-    });
-    return null;
-  }
-}
-
 export async function getSession(): Promise<SessionData | null> {
   try {
     const cookieStore = await cookies();

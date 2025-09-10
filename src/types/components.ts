@@ -1,14 +1,10 @@
-import { Clinic } from './clinics';
+import { Clinic } from "./clinics";
 
 export interface SearchBarProps {
   onSearch: (query: string) => void;
   isLoading: boolean;
   onClear?: () => void;
   placeholder?: string;
-}
-
-export interface StatusBadgeProps {
-  status: "confirmed" | "unknown";
 }
 
 export interface ClinicListItemProps {

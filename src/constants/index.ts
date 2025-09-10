@@ -12,6 +12,4 @@ export const API_ENDPOINTS = {
 export const DEFAULT_LOCATION = "all";
 export const DEFAULT_TREATMENT = "all";
 
-// Search constants
-export const MIN_SEARCH_LENGTH = 2;
 export const SEARCH_DEBOUNCE_MS = 300;

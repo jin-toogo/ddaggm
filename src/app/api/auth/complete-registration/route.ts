@@ -1,16 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { getTemporarySession, clearTemporarySession } from '@/lib/temp-session';
-import { CompleteRegistrationRequest } from '@/types/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { getTemporarySession, clearTemporarySession } from "@/lib/temp-session";
+import { CompleteRegistrationRequest } from "@/types/auth";
+import { z } from "zod";
 
 const prisma = new PrismaClient();
 
 const completeRegistrationSchema = z.object({
-  nickname: z.string().min(1, '닉네임을 입력해주세요'),
+  nickname: z.string().min(1, "닉네임을 입력해주세요"),
   ageGroup: z.string().optional(),
-  gender: z.enum(['m', 'f', 'u']).optional(),
-  privacyAgreed: z.boolean().refine(val => val === true, '개인정보처리방침에 동의해주세요'),
+  gender: z.enum(["m", "f", "u"]).optional(),
+  privacyAgreed: z
+    .boolean()
+    .refine((val) => val === true, "개인정보처리방침에 동의해주세요"),
   marketingAgreed: z.boolean().optional().default(false),
   categoryIds: z.array(z.number()).optional().default([]),
 });
@@ -21,7 +23,7 @@ export async function POST(request: NextRequest) {
     const session = getTemporarySession(request);
     if (!session) {
       return NextResponse.json(
-        { error: '유효하지 않은 세션입니다. 다시 로그인해주세요.' },
+        { error: "유효하지 않은 세션입니다. 다시 로그인해주세요." },
         { status: 401 }
       );
     }
@@ -35,14 +37,14 @@ export async function POST(request: NextRequest) {
       where: {
         OR: [
           { email: session.email },
-          { provider: session.provider, providerId: session.providerId }
-        ]
-      }
+          { provider: session.provider, providerId: session.providerId },
+        ],
+      },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: '이미 가입된 계정입니다. 로그인을 시도해주세요.' },
+        { error: "이미 가입된 계정입니다. 로그인을 시도해주세요." },
         { status: 409 }
       );
     }
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
       // 관심사 설정 (있는 경우)
       if (validatedData.categoryIds.length > 0) {
         await tx.userInterest.createMany({
-          data: validatedData.categoryIds.map(categoryId => ({
+          data: validatedData.categoryIds.map((categoryId) => ({
             userId: newUser.id,
             categoryId,
           })),
@@ -90,7 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result) {
-      throw new Error('사용자 생성에 실패했습니다');
+      throw new Error("사용자 생성에 실패했습니다");
     }
 
     // 5. 세션 사용자 객체 생성
@@ -118,33 +120,32 @@ export async function POST(request: NextRequest) {
     // 6. 응답 설정
     const response = NextResponse.json({
       success: true,
-      message: '회원가입이 완료되었습니다',
+      message: "회원가입이 완료되었습니다",
       user: sessionUser,
     });
 
     // 7. 임시 세션 삭제 및 정식 세션 설정
     clearTemporarySession(response);
-    response.cookies.set('user', JSON.stringify(sessionUser), {
+    response.cookies.set("user", JSON.stringify(sessionUser), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7, // 7일
-      sameSite: 'lax',
+      sameSite: "lax",
     });
-
 
     return response;
   } catch (error) {
-    console.error('완료 등록 오류:', error);
-    
+    console.error("완료 등록 오류:", error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: error.issues[0].message },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { error: '회원가입 처리 중 오류가 발생했습니다' },
+      { error: "회원가입 처리 중 오류가 발생했습니다" },
       { status: 500 }
     );
   }

@@ -65,60 +65,6 @@ export async function loadClinics(
   }
 }
 
-// 검색어와 필터로 한의원을 필터링하는 함수
-export function filterClinics(
-  clinics: Clinic[],
-  searchQuery: string,
-  selectedCity: string,
-  selectedDistrict: string
-): Clinic[] {
-  let filtered = clinics;
-
-  // 검색어로 필터링
-  if (searchQuery.trim()) {
-    filtered = filtered.filter(
-      (clinic) =>
-        clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        clinic.address.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }
-
-  // 도시로 필터링
-  if (selectedCity && selectedCity !== "all") {
-    filtered = filtered.filter((clinic) => clinic.province === selectedCity);
-  }
-
-  // 구/군으로 필터링
-  if (selectedDistrict && selectedDistrict !== "all") {
-    filtered = filtered.filter(
-      (clinic) => clinic.district === selectedDistrict
-    );
-  }
-
-  return filtered;
-}
-
-// 도시 목록을 가져오는 함수
-export function getCities(clinics: Clinic[]): string[] {
-  const cities = new Set(clinics.map((clinic) => clinic.province));
-  return Array.from(cities).sort();
-}
-
-// 구/군 목록을 가져오는 함수
-export function getDistricts(
-  clinics: Clinic[],
-  selectedCity: string
-): string[] {
-  if (selectedCity === "all") return [];
-
-  const districts = new Set(
-    clinics
-      .filter((clinic) => clinic.province === selectedCity)
-      .map((clinic) => clinic.district)
-  );
-  return Array.from(districts).sort();
-}
-
 // 7가지 주요 치료법 카테고리 (기획서 기반)
 export const treatmentCategories = [
   {
@@ -213,16 +159,6 @@ export const treatmentCategories = [
       "예방접종",
     ],
   },
-];
-
-export const nonCoveredServices = [
-  "추나요법",
-  "약침술",
-  "도수치료",
-  "체외충격파치료",
-  "초음파검사",
-  "MRI검사",
-  "예방접종",
 ];
 
 export const cities = [
