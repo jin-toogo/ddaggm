@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, MapPin, Calendar, User } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { NaverBlogIconSmall } from "@/components/ui/naver-blog-icon";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginPromptOverlay } from "@/components/auth/LoginPromptOverlay";
@@ -43,7 +43,7 @@ interface ReviewsData {
   };
 }
 
-export default function ReviewsPage() {
+function ReviewsContent() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [pagination, setPagination] = useState<
     ReviewsData["pagination"] | null
@@ -54,6 +54,7 @@ export default function ReviewsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
 
   // 로그인 상태에 따른 표시할 포스트 계산 (메모화)
@@ -64,9 +65,52 @@ export default function ReviewsPage() {
   const shouldShowLoginPrompt = useMemo(() => {
     return !user && posts.length > 10;
   }, [user, posts.length]);
+
+  // URL 파라미터에서 초기 상태 설정
   useEffect(() => {
-    fetchReviews(currentPage);
-  }, [currentPage, selectedCategory, user]); // user 상태 변경시도 재조회
+    const query = searchParams.get("q") || "";
+    const category = searchParams.get("category") || "";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+
+    setSearchQuery(query);
+    setSelectedCategory(category);
+    setCurrentPage(page);
+  }, [searchParams]);
+
+  // 초기 데이터 로딩 - URL 파라미터 반영
+  useEffect(() => {
+    if (!authLoading) {
+      fetchReviews(currentPage);
+    }
+  }, [currentPage, selectedCategory, searchQuery, user, authLoading]);
+
+  // URL 업데이트 함수
+  const updateURL = (
+    newQuery?: string,
+    newCategory?: string,
+    newPage?: number
+  ) => {
+    const params = new URLSearchParams();
+
+    const query = newQuery ?? searchQuery;
+    const category = newCategory ?? selectedCategory;
+    const page = newPage ?? currentPage;
+
+    if (query && query.trim()) {
+      params.set("q", query.trim());
+    }
+    if (category) {
+      params.set("category", category);
+    }
+    if (page > 1) {
+      params.set("page", page.toString());
+    }
+
+    const newURL = params.toString()
+      ? `/reviews?${params.toString()}`
+      : "/reviews";
+    router.replace(newURL, { scroll: false });
+  };
 
   const fetchReviews = async (page = 1) => {
     setIsLoading(true);
@@ -101,6 +145,7 @@ export default function ReviewsPage() {
 
   const handleSearch = useCallback(() => {
     setCurrentPage(1);
+    updateURL(undefined, undefined, 1);
     fetchReviews(1);
   }, [searchQuery, selectedCategory, user]);
 
@@ -166,6 +211,7 @@ export default function ReviewsPage() {
                 onClick={() => {
                   setSelectedCategory("");
                   setCurrentPage(1);
+                  updateURL(undefined, "", 1);
                 }}
               >
                 전체
@@ -180,6 +226,7 @@ export default function ReviewsPage() {
                   onClick={() => {
                     setSelectedCategory(category);
                     setCurrentPage(1);
+                    updateURL(undefined, category, 1);
                   }}
                 >
                   {category}
@@ -218,7 +265,7 @@ export default function ReviewsPage() {
                         <img
                           src={`/api/proxy/image?url=${encodeURIComponent(
                             post.imageUrl
-                          )}`}
+                          )}&postId=${encodeURIComponent(post.id)}`}
                           alt={post.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -336,7 +383,11 @@ export default function ReviewsPage() {
             <div className="flex items-center justify-center gap-2">
               <Button
                 variant="outline"
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                onClick={() => {
+                  const newPage = Math.max(1, currentPage - 1);
+                  setCurrentPage(newPage);
+                  updateURL(undefined, undefined, newPage);
+                }}
                 disabled={currentPage <= 1}
               >
                 이전
@@ -348,11 +399,11 @@ export default function ReviewsPage() {
 
               <Button
                 variant="outline"
-                onClick={() =>
-                  setCurrentPage(
-                    Math.min(pagination.totalPages, currentPage + 1)
-                  )
-                }
+                onClick={() => {
+                  const newPage = Math.min(pagination.totalPages, currentPage + 1);
+                  setCurrentPage(newPage);
+                  updateURL(undefined, undefined, newPage);
+                }}
                 disabled={currentPage >= pagination.totalPages}
               >
                 다음
@@ -383,5 +434,19 @@ export default function ReviewsPage() {
         showReviews={10}
       />
     </div>
+  );
+}
+
+export default function ReviewsPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto py-6 max-w-7xl">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </div>
+    }>
+      <ReviewsContent />
+    </Suspense>
   );
 }

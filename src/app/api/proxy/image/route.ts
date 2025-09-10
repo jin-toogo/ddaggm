@@ -38,7 +38,9 @@ export async function GET(request: Request) {
     return new Response(imageBuffer, {
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400', // 24시간 캐시
+        'Cache-Control': 'public, max-age=3600', // 1시간 캐시로 단축
+        'Vary': 'Referer', // Referer에 따라 캐시 구분
+        'ETag': `"${Buffer.from(imageUrl).toString('base64')}"`, // URL 기반 고유 ETag
       },
     });
   } catch (error) {
