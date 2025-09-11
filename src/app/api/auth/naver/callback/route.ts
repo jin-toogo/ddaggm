@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
         nickname: existingUser.nickname,
         profileImage: existingUser.profileImage || undefined,
         provider: existingUser.provider,
-        privacyAgreed: existingUser.privacyAgreed,
+        privacyAgreed: existingUser.privacyAgreed, // middleware 검증을 위해 필수
         // interests는 별도 API로 조회하도록 변경 (쿠키 크기 문제 해결)
       };
 

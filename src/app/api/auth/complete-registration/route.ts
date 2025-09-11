@@ -13,6 +13,9 @@ const completeRegistrationSchema = z.object({
   privacyAgreed: z
     .boolean()
     .refine((val) => val === true, "개인정보처리방침에 동의해주세요"),
+  termsAgreed: z
+    .boolean()
+    .refine((val) => val === true, "이용약관에 동의해주세요"),
   marketingAgreed: z.boolean().optional().default(false),
   categoryIds: z.array(z.number()).optional().default([]),
 });
@@ -49,9 +52,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. 트랜잭션으로 사용자 생성 및 관심사 설정
+    // 4. Two-Phase Registration: Phase 1 - PENDING 상태로 사용자 생성
     const result = await prisma.$transaction(async (tx) => {
-      // 사용자 생성
+      // Phase 1: PENDING 상태로 사용자 생성
       const newUser = await tx.user.create({
         data: {
           email: session.email,
@@ -62,7 +65,9 @@ export async function POST(request: NextRequest) {
           provider: session.provider,
           providerId: session.providerId,
           privacyAgreed: validatedData.privacyAgreed,
+          termsAgreed: validatedData.termsAgreed,
           marketingAgreed: validatedData.marketingAgreed || false,
+          status: "PENDING", // 초기 상태는 PENDING
         },
       });
 
@@ -76,55 +81,48 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // 생성된 사용자 정보 조회 (관심사 포함)
-      const userWithInterests = await tx.user.findUnique({
+      // 생성된 사용자 정보 조회 (관심사는 제외 - 쿠키 크기 문제)
+      const userWithoutInterests = await tx.user.findUnique({
         where: { id: newUser.id },
-        include: {
-          interests: {
-            include: {
-              category: true,
-            },
-          },
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          profileImage: true,
+          provider: true,
+          privacyAgreed: true,
+          status: true,
         },
       });
 
-      return userWithInterests;
+      return userWithoutInterests;
     });
 
     if (!result) {
       throw new Error("사용자 생성에 실패했습니다");
     }
 
-    // 5. 세션 사용자 객체 생성
+    // 5. 세션 사용자 객체 생성 (쿠키 크기 최소화)
     const sessionUser = {
       id: result.id.toString(),
       email: result.email,
       nickname: result.nickname,
       profileImage: result.profileImage || undefined,
       provider: result.provider,
-      region: result.region || undefined,
-      ageGroup: result.ageGroup || undefined,
-      gender: (result.gender as "m" | "f" | "u" | undefined) || undefined,
       privacyAgreed: result.privacyAgreed,
-      marketingAgreed: result.marketingAgreed || undefined,
-      interests: result.interests.map((interest) => ({
-        id: interest.id,
-        categoryId: interest.categoryId,
-        category: {
-          ...interest.category,
-          description: interest.category.description || undefined,
-        },
-      })),
+      status: result.status, // PENDING 상태 포함
+      // interests는 별도 API로 조회하도록 변경 (쿠키 크기 문제 해결)
     };
 
-    // 6. 응답 설정
+    // 6. Phase 2를 위한 응답 설정 (userId 포함)
     const response = NextResponse.json({
       success: true,
       message: "회원가입이 완료되었습니다",
       user: sessionUser,
+      userId: result.id, // Phase 2 활성화를 위한 ID
     });
 
-    // 7. 임시 세션 삭제 및 정식 세션 설정
+    // 7. 임시 세션 삭제 및 임시 정식 세션 설정 (PENDING 상태)
     clearTemporarySession(response);
     response.cookies.set("user", JSON.stringify(sessionUser), {
       httpOnly: true,

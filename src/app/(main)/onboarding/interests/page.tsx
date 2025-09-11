@@ -94,7 +94,6 @@ function InterestsOnboardingContent() {
       })
     );
 
-
     // 다음 단계로 이동 (API 호출하지 않음)
     router.push("/onboarding/complete");
   };

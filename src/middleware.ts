@@ -33,7 +33,17 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // 보호된 경로 인증 확인 (/onboarding은 제외 - 신규 사용자 접근 허용)
+  // onboarding 페이지 접근 제어 - 이미 가입된 사용자 차단
+  if (pathname.startsWith("/onboarding")) {
+    const session = getSessionFromRequest(request);
+    
+    // 이미 로그인되고 개인정보 동의가 완료된 사용자는 메인 페이지로 리다이렉트
+    if (session && session.privacyAgreed) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
+  // 보호된 경로 인증 확인
   const protectedPaths = ["/profile"];
   const isProtectedPath = protectedPaths.some((path) =>
     pathname.startsWith(path)

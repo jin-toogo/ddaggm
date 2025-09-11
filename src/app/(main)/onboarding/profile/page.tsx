@@ -45,7 +45,6 @@ function ProfileOnboardingContent() {
         ageGroup: pendingUser.ageGroup || "",
         gender: pendingUser.gender || "",
       });
-
     }
   }, [loading, pendingUser, pendingError, router]);
 

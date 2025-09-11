@@ -14,6 +14,7 @@ export interface CompleteRegistrationRequest {
   ageGroup?: string;
   gender?: 'm' | 'f';
   privacyAgreed: boolean;
+  termsAgreed: boolean;
   marketingAgreed?: boolean;
   categoryIds: number[];
 }

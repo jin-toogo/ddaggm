@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { usePendingUser } from "@/hooks/usePendingUser";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { OnboardingProgress } from "@/components/interests/OnboardingProgress";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +26,7 @@ function CompleteOnboardingContent() {
   const [error, setError] = useState<string | null>(null);
   const { refreshSession } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+
 
   // 동의 상태 관리
   const [agreements, setAgreements] = useState({
@@ -86,8 +87,8 @@ function CompleteOnboardingContent() {
         } else if (typeof interestsData.categoryIds === "string") {
           categoryIds = interestsData.categoryIds
             .split(",")
-            .map((id) => parseInt(id.trim()))
-            .filter((id) => !isNaN(id));
+            .map((id: string) => parseInt(id.trim()))
+            .filter((id: number) => !isNaN(id));
         }
       }
 
@@ -97,6 +98,7 @@ function CompleteOnboardingContent() {
         ageGroup: profileData.ageGroup || pendingUser.ageGroup,
         gender: profileData.gender || pendingUser.gender,
         privacyAgreed: agreements.privacyPolicy,
+        termsAgreed: agreements.termsOfService,
         categoryIds: categoryIds,
       };
 
@@ -116,6 +118,30 @@ function CompleteOnboardingContent() {
       }
 
       const result = await response.json();
+
+      // Phase 2: 클라이언트에서 성공 응답을 받으면 사용자 활성화
+      if (result.success && result.userId) {
+        try {
+          const confirmResponse = await fetch("/api/auth/confirm-registration", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ userId: result.userId }),
+          });
+
+          if (confirmResponse.ok) {
+            // 활성화 성공
+            console.log("사용자 활성화 완료");
+          } else {
+            console.warn("사용자 활성화 실패, 하지만 회원가입은 완료됨");
+          }
+        } catch (confirmError) {
+          console.warn("사용자 활성화 요청 실패:", confirmError);
+          // 활성화 실패해도 회원가입은 완료된 상태
+        }
+      }
 
       // 세션 스토리지 정리
       sessionStorage.removeItem("onboarding-profile");
