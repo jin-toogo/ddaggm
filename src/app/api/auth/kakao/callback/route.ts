@@ -41,6 +41,11 @@ interface KakaoUserInfo {
 
 export async function GET(request: NextRequest) {
   try {
+    // 5. 새 사용자 - 임시 세션 생성
+    const baseUrl =
+      process.env.NEXTAUTH_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      request.url;
     const { searchParams } = new URL(request.url);
     const code = searchParams.get("code");
     const error = searchParams.get("error");
@@ -180,8 +185,8 @@ export async function GET(request: NextRequest) {
       });
 
       const redirectUrl = existingUser.privacyAgreed
-        ? new URL("/", request.url)
-        : new URL("/onboarding/profile", request.url);
+        ? new URL("/", baseUrl)
+        : new URL("/onboarding/profile", baseUrl);
 
       const response = NextResponse.redirect(redirectUrl);
 
@@ -203,12 +208,6 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // 5. 새 사용자 - 임시 세션 생성
-    const baseUrl =
-      process.env.NEXTAUTH_URL ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      request.url;
-    
     const response = NextResponse.redirect(
       new URL("/onboarding/profile", baseUrl)
     );
