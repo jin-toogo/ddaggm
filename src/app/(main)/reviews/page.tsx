@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback, Suspense } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  Suspense,
+} from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -178,7 +184,7 @@ function ReviewsContent() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">한의원 후기</h1>
         <p className="text-muted-foreground">
-          실제 환자들의 한의원 방문 후기를 확인해보세요.
+          에디터들이 선별한 찐으로 도움되는 후기들을 확인해보세요.
         </p>
       </div>
 
@@ -400,7 +406,10 @@ function ReviewsContent() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  const newPage = Math.min(pagination.totalPages, currentPage + 1);
+                  const newPage = Math.min(
+                    pagination.totalPages,
+                    currentPage + 1
+                  );
                   setCurrentPage(newPage);
                   updateURL(undefined, undefined, newPage);
                 }}
@@ -439,13 +448,15 @@ function ReviewsContent() {
 
 export default function ReviewsPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto py-6 max-w-7xl">
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin" />
+    <Suspense
+      fallback={
+        <div className="container mx-auto py-6 max-w-7xl">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ReviewsContent />
     </Suspense>
   );
