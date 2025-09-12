@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionFromRequest } from "@/lib/auth";
 
-// Node.js 런타임 사용으로 crypto 모듈 지원
-export const runtime = "nodejs";
+// JWT 세션 확인 함수 (현재 사용하지 않음 - Edge Runtime 호환성 문제)
+// function getJWTSessionFromRequest(request: NextRequest) { ... }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -33,45 +32,14 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // onboarding 페이지 접근 제어 - 이미 가입된 사용자 차단
-  if (pathname.startsWith("/onboarding")) {
-    const session = getSessionFromRequest(request);
-    
-    // 이미 로그인되고 개인정보 동의가 완료된 사용자는 메인 페이지로 리다이렉트
-    if (session && session.privacyAgreed) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
+  // onboarding 페이지 접근 제어는 클라이언트 사이드에서 처리
 
-  // 보호된 경로 인증 확인
-  const protectedPaths = ["/profile"];
-  const isProtectedPath = protectedPaths.some((path) =>
-    pathname.startsWith(path)
-  );
-
-  if (isProtectedPath) {
-    const session = getSessionFromRequest(request);
-    const hasUserCookie = request.cookies.has("user");
-
-    if (!session) {
-      // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // 개인정보 동의가 필요한 사용자는 온보딩으로 리다이렉트
-    if (!session.privacyAgreed && !pathname.startsWith("/onboarding")) {
-      const onboardingUrl = new URL("/onboarding/interests", request.url);
-      // 원래 가려던 페이지를 기억하기 위해 callbackUrl 추가
-      onboardingUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(onboardingUrl);
-    }
-  }
+  // middleware에서 JWT 인증 체크 제거 (Edge Runtime 호환성 문제)
+  // 대신 페이지 레벨에서 클라이언트 사이드 인증 처리
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/profile/:path*", "/onboarding/:path*"],
+  matcher: ["/api/:path*"],
 };

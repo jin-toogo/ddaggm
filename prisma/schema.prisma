@@ -197,6 +197,9 @@ model User {
   
   // 사용자 상태 관리 (트랜잭션 무결성)
   status       UserStatus @default(PENDING) // "PENDING" | "ACTIVE" | "INACTIVE"
+  
+  // JWT 토큰 버전 관리
+  tokenVersion Int        @default(0) @map("token_version")
 
   // 개인정보보호 강화
   privacyAgreed    Boolean   @default(false) @map("privacy_agreed")
@@ -213,6 +216,7 @@ model User {
   @@index([email])
   @@index([provider])
   @@index([status])
+  @@index([tokenVersion])
   @@map("users")
 }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { generateAccessToken, generateRefreshToken } from "@/lib/jwt";
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
       },
       data: { 
         status: 'ACTIVE',
+        tokenVersion: 1, // 토큰 버전 설정
         updatedAt: new Date()
       },
       select: {
@@ -32,6 +34,7 @@ export async function POST(request: NextRequest) {
         provider: true,
         privacyAgreed: true,
         status: true,
+        tokenVersion: true,
       },
     });
 
@@ -42,9 +45,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 활성화된 사용자 정보로 세션 업데이트
+    // JWT 토큰 생성
+    const accessToken = generateAccessToken({
+      userId: activatedUser.id.toString(),
+      email: activatedUser.email,
+      provider: activatedUser.provider as "naver" | "kakao",
+      status: activatedUser.status as "ACTIVE" | "PENDING" | "INACTIVE",
+      tokenVersion: activatedUser.tokenVersion || 1,
+    });
+
+    const refreshToken = generateRefreshToken({
+      userId: activatedUser.id.toString(),
+      tokenVersion: activatedUser.tokenVersion || 1,
+    });
+
+    // 사용자 정보
     const sessionUser = {
       id: activatedUser.id.toString(),
+      userId: activatedUser.id.toString(),
       email: activatedUser.email,
       nickname: activatedUser.nickname,
       profileImage: activatedUser.profileImage || undefined,
@@ -59,7 +77,24 @@ export async function POST(request: NextRequest) {
       user: sessionUser,
     });
 
-    // 쿠키 업데이트
+    // JWT 토큰을 쿠키에 저장
+    response.cookies.set("access_token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 60, // 30분
+      sameSite: "lax",
+      path: "/",
+    });
+
+    response.cookies.set("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 14 * 24 * 60 * 60, // 14일
+      sameSite: "lax",
+      path: "/",
+    });
+
+    // 기존 user 쿠키도 호환성을 위해 유지 (일시적)
     response.cookies.set("user", JSON.stringify(sessionUser), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

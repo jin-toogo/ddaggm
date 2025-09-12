@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { createTemporarySession } from "@/lib/temp-session";
+import { generateAccessToken, generateRefreshToken } from "@/lib/jwt";
 
 const prisma = new PrismaClient();
 
@@ -45,7 +46,6 @@ export async function GET(request: NextRequest) {
     const error = searchParams.get("error");
 
     if (error) {
-      console.error("카카오 인증 오류:", error);
       return NextResponse.json(
         { error: "카카오 인증이 취소되었습니다." },
         { status: 400 }
@@ -53,7 +53,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (!code) {
-      console.error("인증 코드가 없습니다.");
       return NextResponse.json(
         { error: "인증 코드가 필요합니다." },
         { status: 400 }
@@ -64,7 +63,6 @@ export async function GET(request: NextRequest) {
     const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
 
     if (!clientId) {
-      console.error("KAKAO_CLIENT_ID가 설정되지 않았습니다.");
       return NextResponse.json(
         { error: "카카오 로그인 설정에 문제가 있습니다." },
         { status: 500 }
@@ -88,7 +86,7 @@ export async function GET(request: NextRequest) {
     const tokenResponseText = await tokenResponse.text();
 
     if (!tokenResponse.ok) {
-      console.error("토큰 교환 실패:", tokenResponseText);
+      console.error("카카오 토큰 교환 실패:", tokenResponse.status);
       return NextResponse.json(
         { error: "토큰 교환에 실패했습니다." },
         { status: 400 }
@@ -101,7 +99,6 @@ export async function GET(request: NextRequest) {
 
       // 카카오 API 에러 응답 처리
       if ("error" in tokenData) {
-        console.error("카카오 토큰 API 에러:", tokenData);
         return NextResponse.json(
           {
             error: `토큰 교환 실패: ${
@@ -113,17 +110,13 @@ export async function GET(request: NextRequest) {
       }
 
       if (!tokenData.access_token) {
-        console.error("액세스 토큰이 응답에 없음:", tokenData);
         return NextResponse.json(
           { error: "유효하지 않은 토큰 응답입니다." },
           { status: 400 }
         );
       }
     } catch (parseError) {
-      console.error("카카오 토큰 응답 파싱 실패:", {
-        response: tokenResponseText,
-        error: parseError,
-      });
+      console.error("카카오 토큰 응답 파싱 실패:", parseError);
       return NextResponse.json(
         { error: "토큰 응답 파싱에 실패했습니다." },
         { status: 500 }
@@ -139,8 +132,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!userResponse.ok) {
-      const errorData = await userResponse.text();
-      console.error("사용자 정보 조회 실패:", errorData);
+      console.error("카카오 사용자 정보 조회 실패:", userResponse.status);
       return NextResponse.json(
         { error: "사용자 정보 조회에 실패했습니다." },
         { status: 400 }
@@ -173,31 +165,38 @@ export async function GET(request: NextRequest) {
     });
 
     if (existingUser) {
-      // 이미 가입된 사용자 - 정상 로그인 처리 (쿠키 크기 최소화)
-      const sessionUser = {
-        id: existingUser.id.toString(),
+      // JWT 토큰 생성
+      const accessToken = generateAccessToken({
+        userId: existingUser.id.toString(),
         email: existingUser.email,
-        nickname: existingUser.nickname,
         provider: existingUser.provider,
-        privacyAgreed: existingUser.privacyAgreed, // middleware 검증을 위해 필수
-        // interests는 별도 API로 조회하도록 변경 (쿠키 크기 문제 해결)
-      };
+        status: existingUser.status,
+        tokenVersion: existingUser.tokenVersion,
+      });
 
-      // success 페이지 파라미터 설정
-      const baseUrl =
-        process.env.NEXTAUTH_URL ||
-        process.env.NEXT_PUBLIC_APP_URL ||
-        request.url;
-      const successUrl = new URL("/auth/success", baseUrl);
-      successUrl.searchParams.set("provider", "kakao");
-      successUrl.searchParams.set("redirectUrl", "/");
+      const refreshToken = generateRefreshToken({
+        userId: existingUser.id.toString(),
+        tokenVersion: existingUser.tokenVersion,
+      });
 
-      // 기존 사용자 로그인 처리
-      const response = NextResponse.redirect(successUrl);
-      response.cookies.set("user", JSON.stringify(sessionUser), {
+      const redirectUrl = existingUser.privacyAgreed
+        ? new URL("/", request.url)
+        : new URL("/onboarding/profile", request.url);
+
+      const response = NextResponse.redirect(redirectUrl);
+
+      // JWT 토큰을 쿠키에 설정
+      response.cookies.set("access_token", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 24 * 7, // 7일
+        maxAge: 30 * 60, // 30분
+        sameSite: "lax",
+      });
+
+      response.cookies.set("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 14 * 24 * 60 * 60, // 14일
         sameSite: "lax",
       });
 
@@ -209,6 +208,7 @@ export async function GET(request: NextRequest) {
       process.env.NEXTAUTH_URL ||
       process.env.NEXT_PUBLIC_APP_URL ||
       request.url;
+    
     const response = NextResponse.redirect(
       new URL("/onboarding/profile", baseUrl)
     );
@@ -222,7 +222,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("카카오 콜백 처리 오류:", error);
+    console.error("카카오 로그인 처리 오류:", error);
     return NextResponse.json(
       { error: "로그인 처리 중 오류가 발생했습니다." },
       { status: 500 }

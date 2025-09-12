@@ -24,7 +24,7 @@ function CompleteOnboardingContent() {
   const router = useRouter();
   const { pendingUser, loading, error: pendingError } = usePendingUser();
   const [error, setError] = useState<string | null>(null);
-  const { refreshSession } = useAuth();
+  const { refreshSession, login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -132,8 +132,13 @@ function CompleteOnboardingContent() {
           });
 
           if (confirmResponse.ok) {
-            // 활성화 성공
-            console.log("사용자 활성화 완료");
+            // 활성화 성공, JWT 토큰이 쿠키에 설정됨
+            const confirmResult = await confirmResponse.json();
+            
+            // 활성화 성공 시 자동 로그인 처리
+            if (confirmResult.user) {
+              login(confirmResult.user);
+            }
           } else {
             console.warn("사용자 활성화 실패, 하지만 회원가입은 완료됨");
           }
@@ -147,7 +152,7 @@ function CompleteOnboardingContent() {
       sessionStorage.removeItem("onboarding-profile");
       sessionStorage.removeItem("onboarding-interests");
 
-      // 세션 새로고침
+      // JWT 토큰이 설정되었으므로 세션 새로고침
       await refreshSession();
 
       toast.success("회원가입이 완료되었습니다!");

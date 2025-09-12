@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { verifyAccessToken } from "@/lib/jwt";
 
 const prisma = new PrismaClient();
 const JWT_SECRET =
@@ -34,6 +35,8 @@ export interface User {
 export interface SessionData extends User {
   iat?: number;
   exp?: number;
+  userId?: string;
+  status?: "ACTIVE" | "PENDING" | "INACTIVE";
 }
 
 export function signToken(user: User): string {
@@ -60,19 +63,33 @@ export function getSessionFromRequest(
   request: NextRequest
 ): SessionData | null {
   try {
-    // user 쿠키에서 세션 데이터 확인 (JSON 방식만 사용)
+    // JWT access token에서 세션 데이터 확인
+    const accessToken = request.cookies.get("access_token")?.value;
+    if (accessToken) {
+      const payload = verifyAccessToken(accessToken);
+      if (payload) {
+        return {
+          id: payload.userId,
+          userId: payload.userId,
+          email: payload.email,
+          provider: payload.provider as "naver" | "kakao",
+          status: payload.status,
+          privacyAgreed: payload.status === "ACTIVE",
+        } as SessionData;
+      }
+    }
+
+    // 기존 user 쿠키 fallback (하위 호환성)
     const userCookie = request.cookies.get("user")?.value;
     if (userCookie) {
       try {
         const userData = JSON.parse(userCookie);
-
         return userData;
       } catch (error) {
         console.warn("쿠키 파싱 실패:", error);
       }
     }
 
-    console.log("인증 쿠키를 찾을 수 없음");
     return null;
   } catch (error) {
     console.error("세션 확인 실패:", error);
