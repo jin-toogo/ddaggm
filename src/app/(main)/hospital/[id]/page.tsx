@@ -6,7 +6,6 @@ import NonPaymentItems from "@/components/NonPaymentItems";
 import BackButton from "@/components/BackButton";
 import { StructuredData } from "@/components/StructuredData";
 import { HospitalData } from "@/types";
-import { Button } from "@/components/ui/button";
 import { HospitalBlogSection } from "@/components/HospitalBlogSection";
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {

@@ -21,6 +21,7 @@ interface Props {
 export function HospitalBlogSection({ hospitalId }: Props) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(5);
 
   useEffect(() => {
     fetch(`/api/hospitals/${hospitalId}/blog-posts`)
@@ -31,6 +32,10 @@ export function HospitalBlogSection({ hospitalId }: Props) {
       })
       .catch(() => setLoading(false));
   }, [hospitalId]);
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 10);
+  };
 
   if (loading) {
     return (
@@ -53,7 +58,7 @@ export function HospitalBlogSection({ hospitalId }: Props) {
       </div>
 
       <div className="space-y-4">
-        {posts.map((post, index) => (
+        {posts.slice(0, visibleCount).map((post, index) => (
           <a
             key={index}
             href={post.link}
@@ -116,6 +121,17 @@ export function HospitalBlogSection({ hospitalId }: Props) {
           </a>
         ))}
       </div>
+
+      {visibleCount < posts.length && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={handleLoadMore}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            더보기
+          </button>
+        </div>
+      )}
     </div>
   );
 }
