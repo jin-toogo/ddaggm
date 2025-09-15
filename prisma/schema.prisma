@@ -30,11 +30,12 @@ model Hospital {
   updatedAt        DateTime                 @updatedAt @map("updated_at")
   categoryCount    Int                      @default(0) @map("category_count")
   mainCategories   String?                  @map("main_categories") @db.LongText
-  clinicCategories ClinicCategory[]
-  locationDetails  HospitalLocationDetail?
-  nonPaymentItems  HospitalNonPaymentItem[]
-  operatingHours   HospitalOperatingHour?
-  blogPosts        BlogPost[]
+  clinicCategories  ClinicCategory[]
+  locationDetails   HospitalLocationDetail?
+  nonPaymentItems   HospitalNonPaymentItem[]
+  operatingHours    HospitalOperatingHour?
+  blogPosts         BlogPost[]
+  medicalDepartments MedicalDepartment[]
 
   @@index([name])
   @@index([province, district])
@@ -243,4 +244,22 @@ model UserInterest {
   @@index([userId])
   @@index([categoryId])
   @@map("user_interests")
+}
+
+model MedicalDepartment {
+  id                   Int      @id @default(autoincrement())
+  hospitalId           Int      @map("hospital_id")
+  departmentCode       String   @map("department_code") @db.VarChar(10)
+  departmentName       String   @map("department_name") @db.VarChar(100)
+  specialistCount      Int      @default(0) @map("specialist_count")
+  selectiveDoctorCount Int      @default(0) @map("selective_doctor_count")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+  
+  hospital Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  
+  @@unique([hospitalId, departmentCode])
+  @@index([hospitalId])
+  @@index([departmentCode])
+  @@map("medical_departments")
 }

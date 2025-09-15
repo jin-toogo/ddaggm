@@ -16,6 +16,7 @@ export interface HospitalData {
   establishedDate: string | null;
   totalDoctors: number | null;
   insurance: boolean;
+  medicalDepartments: MedicalDepartment[];
   locationDetails?: {
     landmark: string | null;
     direction: string | null;
@@ -49,6 +50,12 @@ export interface HospitalData {
   nonPaymentItems?: NonPaymentItem[];
 }
 
+export interface MedicalDepartment {
+  departmentCode: string;
+  departmentName: string;
+  specialistCount: number;
+}
+
 export interface NonPaymentItem {
   id: number;
   npayCode: string | null;
@@ -71,14 +78,14 @@ export interface HospitalImportData {
   base_병원홈페이지?: string;
   base_개설일자?: string;
   base_총의사수?: string;
-  'base_좌표(X)'?: string;
-  'base_좌표(Y)'?: string;
-  '세부_위치_공공건물(장소)명'?: string;
+  "base_좌표(X)"?: string;
+  "base_좌표(Y)"?: string;
+  "세부_위치_공공건물(장소)명"?: string;
   세부_위치_방향?: string;
   세부_위치_거리?: string;
   세부_주차_가능대수?: string;
-  '세부_주차_비용 부담여부'?: string;
-  '세부_주차_기타 안내사항'?: string;
+  "세부_주차_비용 부담여부"?: string;
+  "세부_주차_기타 안내사항"?: string;
   세부_휴진안내_일요일?: string;
   세부_휴진안내_공휴일?: string;
   세부_점심시간_평일?: string;
