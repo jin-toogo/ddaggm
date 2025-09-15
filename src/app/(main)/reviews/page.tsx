@@ -322,7 +322,7 @@ function ReviewsContent() {
                         onClick={(e) => {
                           e.preventDefault();
                           if (post.hospital && post.hospital.id) {
-                            router.push(`/hospitals/${post.hospital.id}`);
+                            router.push(`/hospital/${post.hospital.id}`);
                           }
                         }}
                         className="w-full cursor-pointer b-3 p-2 bg-green-50 rounded-lg flex items-center gap-1 mb-1"

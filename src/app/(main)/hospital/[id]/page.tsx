@@ -7,6 +7,7 @@ import BackButton from "@/components/BackButton";
 import { StructuredData } from "@/components/StructuredData";
 import { HospitalData } from "@/types";
 import { HospitalBlogSection } from "@/components/HospitalBlogSection";
+import SimilarHospitalsSection from "@/components/SimilarHospitalsSection";
 
 async function getHospitalData(id: string): Promise<HospitalData | null> {
   try {
@@ -16,13 +17,28 @@ async function getHospitalData(id: string): Promise<HospitalData | null> {
         ? process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
         : "https://ddaggm.com";
 
-    const response = await fetch(`${baseUrl}/api/hospitals/${id}`, {});
-    if (!response.ok) {
+    // 병원 기본 정보와 진료과목 정보를 병렬로 가져오기
+    const [hospitalResponse, departmentsResponse] = await Promise.all([
+      fetch(`${baseUrl}/api/hospitals/${id}`, {}),
+      fetch(`${baseUrl}/api/hospitals/${id}/departments`, {}),
+    ]);
+
+    if (!hospitalResponse.ok) {
       return null;
     }
-    const result = await response.json();
-    // API가 { data: hospital } 형태로 반환하므로 data 속성에서 추출
-    return result.data || result;
+
+    const hospitalResult = await hospitalResponse.json();
+    const hospital = hospitalResult.data || hospitalResult;
+
+    // 진료과목 정보 추가
+    if (departmentsResponse.ok) {
+      const departmentsResult = await departmentsResponse.json();
+      hospital.medicalDepartments = departmentsResult.departments || [];
+    } else {
+      hospital.medicalDepartments = [];
+    }
+
+    return hospital;
   } catch (error) {
     console.error("Error fetching hospital data:", error);
     return null;
@@ -166,14 +182,32 @@ export default async function HospitalDetail({
             <div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 {hospital.name}
+                <span className="text-sm text-gray-600 ml-3">
+                  {hospital.province} {hospital.district}
+                </span>
               </h1>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-3">
                 {hospital.insurance && (
                   <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
                     보험 적용
                   </span>
                 )}
               </div>
+
+              {/* 진료과목 태그 */}
+              {hospital.medicalDepartments &&
+                hospital.medicalDepartments.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {hospital.medicalDepartments.map((dept: any) => (
+                      <span
+                        key={dept.departmentCode}
+                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium"
+                      >
+                        {dept.departmentName}
+                      </span>
+                    ))}
+                  </div>
+                )}
             </div>
           </div>
 
@@ -194,6 +228,9 @@ export default async function HospitalDetail({
 
         {/* Blog Section */}
         <HospitalBlogSection hospitalId={parseInt(id)} />
+
+        {/* Similar Hospitals Section */}
+        <SimilarHospitalsSection hospitalId={parseInt(id)} />
 
         {/* Non-Payment Items */}
         {hospital.nonPaymentItems && hospital.nonPaymentItems.length > 0 && (
