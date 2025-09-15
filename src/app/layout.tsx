@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "따끔",
+  title: "따끔 • ddaggm",
   description:
     "한의원명으로 보험 적용 여부를 쉽게 확인할 수 있는 서비스입니다. 한방 첩약 보험 적용 정보를 제공합니다.",
   keywords: [

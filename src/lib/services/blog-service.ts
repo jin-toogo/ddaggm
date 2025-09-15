@@ -1,5 +1,4 @@
 import xml2js from "xml2js";
-import prisma from "@/lib/prisma";
 
 export interface BlogPost {
   title: string;
@@ -18,47 +17,50 @@ export class BlogService {
     try {
       const lambdaUrl = process.env.LAMBDA_CRAWLER_URL;
       if (!lambdaUrl) {
-        throw new Error('LAMBDA_CRAWLER_URL environment variable is not set');
+        throw new Error("LAMBDA_CRAWLER_URL environment variable is not set");
       }
 
       console.log("Calling Lambda crawler for:", postUrl);
-      
+
       const response = await fetch(lambdaUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ blogUrl: postUrl })
+        body: JSON.stringify({ blogUrl: postUrl }),
       });
 
       if (!response.ok) {
-        console.error(`Lambda call failed: ${response.status} ${response.statusText}`);
+        console.error(
+          `Lambda call failed: ${response.status} ${response.statusText}`
+        );
         return null;
       }
 
       const result = await response.json();
-      
+
       if (!result.success) {
-        console.error('Lambda extraction failed:', result.error);
+        console.error("Lambda extraction failed:", result.error);
         return null;
       }
 
       const blogData = result.data;
-      console.log('Lambda extraction successful:', {
+      console.log("Lambda extraction successful:", {
         title: blogData.title?.substring(0, 50),
         contentLength: blogData.content?.length || 0,
-        author: blogData.author
+        author: blogData.author,
       });
 
       return {
-        title: blogData.title || '',
+        title: blogData.title || "",
         link: postUrl,
-        pubDate: blogData.pubDate || '',
-        description: blogData.description || blogData.content?.substring(0, 1000) || '',
-        author: blogData.author || '',
-        category: blogData.category || '',
+        pubDate: blogData.pubDate || "",
+        description:
+          blogData.description || blogData.content?.substring(0, 1000) || "",
+        author: blogData.author || "",
+        category: blogData.category || "",
         tags: blogData.tags || [],
-        images: blogData.images || []
+        images: blogData.images || [],
       };
     } catch (error) {
       console.error("Lambda blog crawling error:", error);
