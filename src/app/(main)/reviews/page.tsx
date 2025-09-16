@@ -189,7 +189,7 @@ function ReviewsContent() {
       </div>
 
       {/* 검색 및 필터 */}
-      <Card className="mb-6">
+      <Card className="mb-6 py-0">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4">
             <div className="flex-1">
@@ -255,12 +255,21 @@ function ReviewsContent() {
         <>
           <div className="grid grid-cols-1 mb-8">
             {displayPosts.map((post, index) => (
-              <a
-                href={post.originalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <div
                 key={post.id}
-                className={`overflow-hidden transition-shadow border-b border-gray-200 py-8 ${
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (user) {
+                    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+                    window.open(
+                      `${baseUrl}/reviews/${post.id}?link=${post.originalUrl}`,
+                      "_blank"
+                    );
+                  } else {
+                    setShowLoginPrompt(true);
+                  }
+                }}
+                className={`overflow-hidden transition-shadow border-b border-gray-200 py-8 cursor-pointer hover:bg-gray-50 ${
                   !user && index === 9 ? "relative" : ""
                 }`}
               >
@@ -357,7 +366,7 @@ function ReviewsContent() {
                     <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 text-center"></div>
                   </div>
                 )}
-              </a>
+              </div>
             ))}
           </div>
 
