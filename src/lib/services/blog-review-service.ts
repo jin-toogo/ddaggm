@@ -87,7 +87,9 @@ export class BlogReviewService {
     console.log("Summary:", summary);
 
     // 카테고리 및 태그 추출
-    const categories = extractCategories(cleanContent, blogPost.title);
+    const categories = row.category 
+      ? [row.category] 
+      : extractCategories(cleanContent, blogPost.title);
     const tags = [...extractTags(cleanContent), ...(blogPost.tags || [])];
 
     // BlogPost 생성

@@ -2,6 +2,7 @@ export interface BlogCsvRow {
   blog_url: string;
   clinic_name?: string;
   clinic_address?: string;
+  category?: string;
   notes?: string;
 }
 
@@ -32,15 +33,16 @@ export function parseCSV(csvContent: string): BlogCsvRow[] {
   }
 
   const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-  const expectedHeaders = ['네이버 블로그 링크', '한의원명(있으면)', '한의원 주소', '비고'];
-  const alternativeHeaders = ['blog_url', 'clinic_name', 'clinic_address', 'notes'];
   
-  // 헤더 검증 (한글 헤더 또는 영문 헤더 둘 다 허용)
-  const isKoreanHeaders = expectedHeaders.every(header => headers.includes(header));
-  const isEnglishHeaders = alternativeHeaders.every(header => headers.includes(header));
+  // 헤더 검증 (기본 필수 헤더만 검사, 카테고리는 선택적)
+  const requiredKoreanHeaders = ['네이버 블로그 링크', '한의원명(있으면)', '한의원 주소', '비고'];
+  const requiredEnglishHeaders = ['blog_url', 'clinic_name', 'clinic_address', 'notes'];
+  
+  const isKoreanHeaders = requiredKoreanHeaders.every(header => headers.includes(header));
+  const isEnglishHeaders = requiredEnglishHeaders.every(header => headers.includes(header));
   
   if (!isKoreanHeaders && !isEnglishHeaders) {
-    throw new Error(`CSV 헤더가 올바르지 않습니다. 필요한 헤더: ${expectedHeaders.join(', ')}`);
+    throw new Error(`CSV 헤더가 올바르지 않습니다. 필요한 헤더: ${requiredKoreanHeaders.join(', ')}`);
   }
 
   const data: BlogCsvRow[] = [];
@@ -50,20 +52,24 @@ export function parseCSV(csvContent: string): BlogCsvRow[] {
     blog_url: '네이버 블로그 링크',
     clinic_name: '한의원명(있으면)',
     clinic_address: '한의원 주소',
-    notes: '비고'
+    notes: '비고',
+    category: '카테고리'
   } : {
     blog_url: 'blog_url',
     clinic_name: 'clinic_name',
     clinic_address: 'clinic_address',
-    notes: 'notes'
+    notes: 'notes',
+    category: 'category'
   };
   
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
+    const categoryIndex = headers.indexOf(headerMap.category);
     const row: BlogCsvRow = {
       blog_url: values[headers.indexOf(headerMap.blog_url)] || '',
       clinic_name: values[headers.indexOf(headerMap.clinic_name)] || undefined,
       clinic_address: values[headers.indexOf(headerMap.clinic_address)] || undefined,
+      category: categoryIndex !== -1 ? values[categoryIndex] || undefined : undefined,
       notes: values[headers.indexOf(headerMap.notes)] || undefined,
     };
 

@@ -4,7 +4,7 @@ import { BlogReviewService } from '@/lib/services/blog-review-service';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url, clinicName, clinicAddress, notes } = body;
+    const { url, clinicName, clinicAddress, category, notes } = body;
 
     if (!url) {
       return NextResponse.json(
@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
       blog_url: url,
       clinic_name: clinicName,
       clinic_address: clinicAddress,
+      category: category,
       notes: notes
     };
 

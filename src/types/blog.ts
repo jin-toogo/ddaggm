@@ -30,6 +30,7 @@ export interface BlogCsvRow {
   blog_url: string;
   clinic_name?: string;
   clinic_address?: string;
+  category?: string;
   notes?: string;
 }
 

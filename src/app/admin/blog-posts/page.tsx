@@ -42,6 +42,7 @@ export default function AdminBlogPostsPage() {
     url: "",
     clinicName: "",
     clinicAddress: "",
+    category: "",
     notes: "",
   });
   const [isSubmittingSingle, setIsSubmittingSingle] = useState(false);
@@ -108,6 +109,9 @@ export default function AdminBlogPostsPage() {
     setIsSubmittingSingle(true);
     setSingleError(null);
     setSingleResult(null);
+    
+    // 로딩 테스트용 딜레이
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
       const response = await fetch("/api/admin/blog-posts", {
@@ -119,6 +123,7 @@ export default function AdminBlogPostsPage() {
           url: singlePost.url,
           clinicName: singlePost.clinicName,
           clinicAddress: singlePost.clinicAddress,
+          category: singlePost.category,
           notes: singlePost.notes,
         }),
       });
@@ -131,6 +136,7 @@ export default function AdminBlogPostsPage() {
           url: "",
           clinicName: "",
           clinicAddress: "",
+          category: "",
           notes: "",
         });
       } else {
@@ -147,10 +153,10 @@ export default function AdminBlogPostsPage() {
   };
 
   const downloadSampleCsv = () => {
-    const sampleData = `네이버 블로그 링크,한의원명(있으면),한의원 주소,비고
-https://blog.naver.com/example1/123,이병삼경희한의원,서울시 강남구,
-https://blog.naver.com/example2/456,대추밭백한의원,경기도 용인시,
-https://blog.naver.com/example3/789,,,한의원 정보 없음`;
+    const sampleData = `네이버 블로그 링크,한의원명(있으면),한의원 주소,비고,카테고리
+https://blog.naver.com/example1/123,이병삼경희한의원,서울시 강남구,,중풍
+https://blog.naver.com/example2/456,대추밭백한의원,경기도 용인시,,허리치료
+https://blog.naver.com/example3/789,,,한의원 정보 없음,척추교정`;
 
     const blob = new Blob([sampleData], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -227,6 +233,22 @@ https://blog.naver.com/example3/789,,,한의원 정보 없음`;
                 disabled={isSubmittingSingle}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">카테고리 (선택)</Label>
+            <Input
+              id="category"
+              placeholder="예: 중풍, 허리치료, 척추교정 등"
+              value={singlePost.category}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSinglePost((prev) => ({
+                  ...prev,
+                  category: e.target.value,
+                }))
+              }
+              disabled={isSubmittingSingle}
+            />
           </div>
 
           <div className="space-y-2">
@@ -417,14 +439,14 @@ https://blog.naver.com/example3/789,,,한의원 정보 없음`;
           <div className="space-y-2">
             <p className="text-sm font-medium">필수 헤더 (첫 번째 행):</p>
             <code className="block p-2 bg-muted rounded text-sm">
-              네이버 블로그 링크,한의원명(있으면),한의원 주소,비고
+              네이버 블로그 링크,한의원명(있으면),한의원 주소,비고,카테고리
             </code>
 
             <p className="text-sm font-medium mt-4">예시 데이터:</p>
             <code className="block p-2 bg-muted rounded text-sm">
-              https://blog.naver.com/example/123,이병삼경희한의원,서울시 강남구,
+              https://blog.naver.com/example/123,이병삼경희한의원,서울시 강남구,,중풍
               <br />
-              https://blog.naver.com/example/456,,,한의원 정보 없음
+              https://blog.naver.com/example/456,,,한의원 정보 없음,척추교정
             </code>
 
             <div className="mt-4 text-sm text-muted-foreground">
@@ -438,6 +460,9 @@ https://blog.naver.com/example3/789,,,한의원 정보 없음`;
                 </li>
                 <li>
                   <strong>한의원 주소</strong>: 한의원 주소 (선택사항)
+                </li>
+                <li>
+                  <strong>카테고리</strong>: 진료 분야 카테고리 (선택사항)
                 </li>
                 <li>
                   <strong>비고</strong>: 비고사항 (선택사항)
