@@ -12,6 +12,7 @@ import {
   User,
   LogOut,
   Settings,
+  Leaf,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -27,6 +28,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { href: "/", label: "홈", icon: Home },
   { href: "/herbal-insurance", label: "첩약 보험", icon: Pill },
+  { href: "/herbal-supplements", label: "한방건기식", icon: Leaf },
   { href: "/non-covered", label: "비급여", icon: DollarSign },
   { href: "/reviews", label: "후기", icon: GanttChart },
   {

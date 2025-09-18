@@ -263,3 +263,44 @@ model MedicalDepartment {
   @@index([departmentCode])
   @@map("medical_departments")
 }
+
+// 한방건기식 제품 모델
+model HerbalProduct {
+  id          Int      @id @default(autoincrement())
+  name        String   @map("name") @db.VarChar(500)
+  category    String   @map("category") @db.VarChar(100)
+  description String?  @map("description") @db.Text
+  price       String   @map("price") @db.VarChar(50)
+  brand       String   @map("brand") @db.VarChar(100)
+  url         String   @map("url") @db.Text
+  imageUrl    String   @map("image_url") @db.Text
+  
+  // 메타데이터
+  isActive    Boolean  @default(true) @map("is_active")
+  displayOrder Int     @default(0) @map("display_order")
+  
+  // 통계
+  clickCount  Int      @default(0) @map("click_count")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@index([category])
+  @@index([isActive])
+  @@index([displayOrder])
+  @@map("herbal_products")
+}
+
+// 한방건기식 피드백 모델  
+model HerbalFeedback {
+  id        Int      @id @default(autoincrement())
+  content   String   @map("content") @db.Text
+  userId    Int?     @map("user_id")
+  userAgent String?  @map("user_agent") @db.VarChar(500)
+  ipAddress String?  @map("ip_address") @db.VarChar(45)
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@index([createdAt])
+  @@map("herbal_feedback")
+}

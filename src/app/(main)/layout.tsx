@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 const getPageTitle = (pathname: string): string => {
   if (pathname === "/") return "홈";
   if (pathname === "/herbal-insurance") return "첩약 보험";
+  if (pathname === "/herbal-supplements") return "한방건기식";
   if (pathname === "/non-covered") return "비급여 진료";
   if (pathname === "/reviews") return "한의원 후기";
   if (pathname === "/login") return "로그인";
