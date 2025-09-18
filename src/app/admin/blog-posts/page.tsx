@@ -109,9 +109,6 @@ export default function AdminBlogPostsPage() {
     setIsSubmittingSingle(true);
     setSingleError(null);
     setSingleResult(null);
-    
-    // 로딩 테스트용 딜레이
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
       const response = await fetch("/api/admin/blog-posts", {
@@ -444,7 +441,8 @@ https://blog.naver.com/example3/789,,,한의원 정보 없음,척추교정`;
 
             <p className="text-sm font-medium mt-4">예시 데이터:</p>
             <code className="block p-2 bg-muted rounded text-sm">
-              https://blog.naver.com/example/123,이병삼경희한의원,서울시 강남구,,중풍
+              https://blog.naver.com/example/123,이병삼경희한의원,서울시
+              강남구,,중풍
               <br />
               https://blog.naver.com/example/456,,,한의원 정보 없음,척추교정
             </code>
